@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sweet Pengüin — Gestión de Costos y Recetas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+          },
+          colors: {
+            vanilla: {
+              50: '#FFFDF9',
+              100: '#FAF6F0',
+              200: '#F7F1E7',
+              300: '#EDE3D3',
+            },
+            lavender: {
+              50: '#F7F3FB',
+              100: '#EFE8F7',
+              200: '#E2D6F0',
+              300: '#D8CBE8',
+              400: '#C8B4DC',
+              500: '#B69ED1',
+            },
+            plum: {
+              500: '#7D5BA6',
+              600: '#6E4B8E',
+              700: '#583A73',
+              800: '#4A2E66',
+              900: '#3B2454',
+              950: '#2D1B3E',
+            },
+            mutedplum: {
+              600: '#6B5B7B',
+              700: '#564766',
+            }
+          },
+          boxShadow: {
+            'plum-sm': '0 2px 8px -2px rgba(110, 75, 142, 0.12)',
+            'plum-md': '0 8px 24px -6px rgba(59, 36, 84, 0.14)',
+            'plum-lg': '0 16px 32px -8px rgba(45, 27, 62, 0.18)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Patrón sutil decorativo de pastelería en tonos lavanda sobre fondo crema */
+    body {
+      background-color: #FAF6F0;
+      background-image: url("data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23C8B4DC' stroke-width='1.2' stroke-opacity='0.32'%3E%3C!-- Estrella 4 puntas --%3E%3Cpath d='M30 18 L32.5 25.5 L40 28 L32.5 30.5 L30 38 L27.5 30.5 L20 28 L27.5 25.5 Z' fill='%23C8B4DC' fill-opacity='0.14'/%3E%3C!-- Batidor de varillas --%3E%3Cg transform='translate(125, 28) rotate(32)'%3E%3Crect x='-2' y='20' width='4' height='14' rx='2'/%3E%3Cellipse cx='0' cy='10' rx='6' ry='11'/%3E%3Cellipse cx='0' cy='10' rx='3' ry='11'/%3E%3C/g%3E%3C!-- Onda decorativa --%3E%3Cpath d='M18 115 Q 25 109, 32 115 T 46 115 T 60 115' stroke-linecap='round'/%3E%3C!-- Estrellita 5 puntas --%3E%3Cpath d='M145 120 L147.5 126 L154 126.5 L149 130.5 L150.5 137 L145 133.5 L139.5 137 L141 130.5 L136 126.5 L142.5 126 Z' fill='%23C8B4DC' fill-opacity='0.12'/%3E%3C!-- Cupcake / Macaron minimalista --%3E%3Cg transform='translate(82, 85)'%3E%3Cellipse cx='0' cy='0' rx='10' ry='4.5'/%3E%3Cline x1='-9' y1='3' x2='9' y2='3'/%3E%3Cellipse cx='0' cy='6.5' rx='10' ry='4.5'/%3E%3C/g%3E%3C!-- Puntos destello --%3E%3Ccircle cx='85' cy='25' r='1.8' fill='%23B69ED1' fill-opacity='0.28' stroke='none'/%3E%3Ccircle cx='28' cy='155' r='2' fill='%23B69ED1' fill-opacity='0.28' stroke='none'/%3E%3Ccircle cx='160' cy='78' r='1.5' fill='%23B69ED1' fill-opacity='0.28' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    /* Personalización de barras de desplazamiento en tonos lavanda/violeta */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #FAF6F0;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #C8B4DC;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #6E4B8E;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="text-plum-950 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- Barra de Navegación Superior -->
+  <header class="sticky top-0 z-30 bg-vanilla-50/95 backdrop-blur-md border-b border-lavender-300 shadow-plum-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between py-3 gap-3">
+        
+        <!-- Identidad de Marca con Emblema SVG fiel a Sweet Pengüin -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <!-- Logo Circular SVG -->
+            <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-full shadow-plum-sm bg-vanilla-100 flex items-center justify-center overflow-hidden">
+              <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg" aria-label="Logo Sweet Pengüin">
+                <defs>
+                  <path id="topArc" d="M 34,100 A 66,66 0 1,1 166,100" />
+                  <path id="bottomArc" d="M 30,104 A 70,70 0 0,0 170,104" />
+                </defs>
+                <!-- Fondo crema del círculo -->
+                <circle cx="100" cy="100" r="96" fill="#FAF6F0" />
+                <!-- Anillo exterior grueso lavanda/violeta -->
+                <circle cx="100" cy="100" r="92" fill="none" stroke="#8C6BAE" stroke-width="8" />
+                <!-- Anillo interior fino -->
+                <circle cx="100" cy="100" r="83" fill="none" stroke="#8C6BAE" stroke-width="2" />
+
+                <!-- Texto curvo superior "Sweet" -->
+                <text fill="#6E4B8E" font-family="'Playfair Display', Georgia, serif" font-weight="800" font-size="25" letter-spacing="3.5">
+                  <textPath href="#topArc" startOffset="50%" text-anchor="middle">Sweet</textPath>
+                </text>
+
+                <!-- Texto curvo inferior "Penguin" -->
+                <text fill="#6E4B8E" font-family="'Playfair Display', Georgia, serif" font-weight="800" font-size="23" letter-spacing="2.5">
+                  <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">Penguin</textPath>
+                </text>
+
+                <!-- Ilustración del Pingüino con gorro de chef -->
+                <g transform="translate(0, 4)">
+                  <!-- Gorro de chef relleno lavanda pastel -->
+                  <path d="M 80,68 C 72,66 68,57 74,51 C 72,43 81,36 89,40 C 95,33 108,35 111,43 C 119,44 122,54 115,60 L 112,68 Z" fill="#B69ED1" stroke="#6E4B8E" stroke-width="3.2" stroke-linejoin="round" />
+                  <!-- Banda del gorro -->
+                  <path d="M 81,67 L 111,65 L 113,73 L 83,75 Z" fill="#C8B4DC" stroke="#6E4B8E" stroke-width="3" stroke-linejoin="round" />
+                  <line x1="90" y1="67" x2="91" y2="74" stroke="#6E4B8E" stroke-width="2.2" />
+                  <line x1="101" y1="66" x2="102" y2="73" stroke="#6E4B8E" stroke-width="2.2" />
+
+                  <!-- Cuerpo del pingüino de perfil -->
+                  <path d="M 85,75 C 79,84 79,98 81,112 C 81,122 77,131 75,136 C 85,140 105,141 116,135 C 123,128 122,112 117,99 C 115,93 114,88 116,83 C 116,78 112,74 107,73" fill="#FFFDF9" stroke="#6E4B8E" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+                  <!-- Pico -->
+                  <path d="M 116,78 L 127,76 C 129,76 129,79 127,81 L 117,86 Z" fill="#FFFDF9" stroke="#6E4B8E" stroke-width="3.2" stroke-linejoin="round" />
+                  <!-- Mejilla / Cuello -->
+                  <path d="M 105,93 C 111,93 115,89 116,85" fill="none" stroke="#6E4B8E" stroke-width="2.8" stroke-linecap="round" />
+                  <!-- Aleta -->
+                  <path d="M 96,96 C 95,108 89,119 81,125" fill="none" stroke="#6E4B8E" stroke-width="3.2" stroke-linecap="round" />
+                  <!-- Patitas -->
+                  <path d="M 83,139 C 80,144 87,147 95,145 C 97,144 96,140 93,139" fill="#FFFDF9" stroke="#6E4B8E" stroke-width="3" stroke-linecap="round" />
+                  <path d="M 104,139 C 106,144 115,146 121,143 C 123,141 119,138 114,137" fill="#FFFDF9" stroke="#6E4B8E" stroke-width="3" stroke-linecap="round" />
+                </g>
+              </svg>
+            </div>
+
+            <div>
+              <div class="flex items-center gap-2">
+                <h1 class="font-serif text-xl sm:text-2xl font-bold text-plum-900 tracking-tight">Sweet Pengüin</h1>
+                <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-lavender-100 text-plum-700 border border-lavender-300">
+                  <span class="w-1.5 h-1.5 rounded-full bg-plum-600 animate-pulse"></span>
+                  Modo Base de Datos
+                </span>
+              </div>
+              <p class="text-xs text-mutedplum-600">Pastelería Artesanal • Costeo y Rentabilidad</p>
+            </div>
+          </div>
+
+          <!-- Acciones rápidas móvil -->
+          <div class="flex md:hidden items-center gap-1.5">
+            <button onclick="openSqlModal()" title="Ver Esquema SQL" class="p-2 rounded-xl bg-lavender-100 text-plum-800 border border-lavender-300 hover:bg-lavender-200 transition text-xs font-semibold">
+              SQL
+            </button>
+            <button onclick="loadFromDatabase()" title="Recargar desde BD" class="p-2 rounded-xl bg-lavender-100 text-plum-800 border border-lavender-300 hover:bg-lavender-200 transition text-xs font-semibold">
+              Recargar
+            </button>
+          </div>
+        </div>
+
+        <!-- Pestañas de Navegación Principal -->
+        <nav class="flex items-center bg-lavender-100 p-1 rounded-2xl border border-lavender-300 self-stretch md:self-auto">
+          <button id="tab-productos" onclick="switchView('productos')" class="flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-plum-600 text-vanilla-50 shadow-plum-sm">
+            <span>🧁</span>
+            <span>Productos y Recetas</span>
+            <span id="badge-productos-count" class="ml-1 px-2 py-0.5 text-xs rounded-full bg-plum-900 text-vanilla-50">0</span>
+          </button>
+          <button id="tab-ingredientes" onclick="switchView('ingredientes')" class="flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-plum-900 hover:bg-lavender-200/70">
+            <span>🧈</span>
+            <span>Materia Prima</span>
+            <span id="badge-ingredientes-count" class="ml-1 px-2 py-0.5 text-xs rounded-full bg-lavender-400/60 text-plum-950">0</span>
+          </button>
+        </nav>
+
+        <!-- Acciones Globales Desktop -->
+        <div class="hidden md:flex items-center gap-2">
+          <button onclick="openSqlModal()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-lavender-100 hover:bg-lavender-200 text-plum-800 border border-lavender-300 transition">
+            <svg class="w-4 h-4 text-plum-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582 4 8 4s8-1.79 8-4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+            Esquema SQL
+          </button>
+          <button onclick="loadFromDatabase()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-lavender-400/35 hover:bg-lavender-400/60 text-plum-900 border border-lavender-400 transition" title="Recargar datos desde la base de datos">
+            <svg class="w-4 h-4 text-plum-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            Recargar BD
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast / Notificación flotante -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Contenido Principal -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+    <!-- ===================================================================== -->
+    <!-- VISTA 2 (INICIAL): PRODUCTOS Y RECETAS (COSTEO Y GANANCIA)            -->
+    <!-- ===================================================================== -->
+    <section id="view-productos" class="space-y-6">
+      
+      <!-- Encabezado y KPIs Rápidos -->
+      <div class="bg-gradient-to-r from-vanilla-50 via-lavender-100/80 to-vanilla-50 rounded-3xl p-5 sm:p-6 border border-lavender-300 shadow-plum-sm">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-lavender-400/40 text-plum-900 border border-lavender-400/60 mb-2">
+              Página 2 • Catálogo y Rentabilidad
+            </span>
+            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-plum-950">Productos y Recetas</h2>
+            <p class="text-sm text-mutedplum-600 mt-1 max-w-2xl">
+              Ajusta las cantidades por receta, el rinde en unidades o el porcentaje de ganancia. Cualquier cambio en la <strong>Materia Prima</strong> recalcula este catálogo al instante.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <button onclick="openNewProductModal()" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-semibold bg-plum-600 hover:bg-plum-800 text-vanilla-50 shadow-plum-md transition cursor-pointer">
+              <svg class="w-5 h-5 text-lavender-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              Nuevo Producto / Receta
+            </button>
+          </div>
+        </div>
+
+        <!-- Resumen Métricas -->
+        <div id="productos-kpis" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-5 border-t border-lavender-300/80">
+          <!-- Renderizado dinámico -->
+        </div>
+      </div>
+
+      <!-- Barra de Búsqueda y Filtros de Productos -->
+      <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-vanilla-50 p-4 rounded-2xl border border-lavender-300 shadow-plum-sm">
+        <div class="relative flex-1">
+          <svg class="w-5 h-5 text-plum-600/60 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input type="text" id="search-productos" oninput="renderProductos()" placeholder="Buscar torta, cookie, budín o ingrediente..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-vanilla-100 border border-lavender-300 text-sm text-plum-950 placeholder-mutedplum-600/60 focus:outline-none focus:ring-2 focus:ring-plum-500 focus:bg-vanilla-50 transition">
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <select id="filter-category" onchange="renderProductos()" class="px-3.5 py-2.5 rounded-xl bg-vanilla-100 border border-lavender-300 text-sm font-medium text-plum-900 focus:outline-none focus:ring-2 focus:ring-plum-500">
+            <option value="all">Todas las categorías</option>
+            <option value="Tortas">Tortas (26cm + Packaging)</option>
+            <option value="Cookies y Alfajores">Cookies y Alfajores</option>
+            <option value="Budines y Bizcochuelos">Budines y Bizcochuelos</option>
+            <option value="Bases y Cremas">Bases, Cremas y Otros</option>
+          </select>
+          <button onclick="toggleAllCards()" id="btn-toggle-all" class="px-3.5 py-2.5 rounded-xl bg-lavender-100 hover:bg-lavender-200 border border-lavender-300 text-xs font-semibold text-plum-900 transition">
+            Contraer / Expandir
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid de Tarjetas de Productos -->
+      <div id="productos-grid" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <!-- Renderizado dinámico -->
+      </div>
+    </section>
+
+
+    <!-- ===================================================================== -->
+    <!-- VISTA 1: MATERIA PRIMA (INGREDIENTES E INSUMOS)                       -->
+    <!-- ===================================================================== -->
+    <section id="view-ingredientes" class="hidden space-y-6">
+      
+      <!-- Encabezado Materia Prima -->
+      <div class="bg-gradient-to-r from-vanilla-50 via-lavender-100/80 to-vanilla-50 rounded-3xl p-5 sm:p-6 border border-lavender-300 shadow-plum-sm">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-lavender-400/40 text-plum-900 border border-lavender-400/60 mb-2">
+              Página 1 • Base de Datos de Insumos
+            </span>
+            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-plum-950">Materia Prima e Insumos</h2>
+            <p class="text-sm text-mutedplum-600 mt-1 max-w-2xl">
+              Edita directamente el <strong>precio del paquete</strong> o la <strong>cantidad de compra</strong>. El sistema calculará el costo por kg, litro o unidad y actualizará automáticamente todas las recetas.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="openNewIngredientModal()" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-semibold bg-plum-600 hover:bg-plum-800 text-vanilla-50 shadow-plum-md transition cursor-pointer">
+              <svg class="w-5 h-5 text-lavender-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              Agregar Ingrediente
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buscador y Filtro de Unidad -->
+      <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-vanilla-50 p-4 rounded-2xl border border-lavender-300 shadow-plum-sm">
+        <div class="relative flex-1">
+          <svg class="w-5 h-5 text-plum-600/60 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input type="text" id="search-ingredientes" oninput="renderIngredientes()" placeholder="Buscar ingrediente (ej. Manteca, Chocolate, Dulce de leche)..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-vanilla-100 border border-lavender-300 text-sm text-plum-950 placeholder-mutedplum-600/60 focus:outline-none focus:ring-2 focus:ring-plum-500 focus:bg-vanilla-50 transition">
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="filter-unidad" onchange="renderIngredientes()" class="px-3.5 py-2.5 rounded-xl bg-vanilla-100 border border-lavender-300 text-sm font-medium text-plum-900 focus:outline-none focus:ring-2 focus:ring-plum-500">
+            <option value="all">Todas las unidades</option>
+            <option value="kg">Por Kilogramo (kg)</option>
+            <option value="lt">Por Litro (lt)</option>
+            <option value="unid">Por Unidad (unid)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tabla Interactiva de Ingredientes -->
+      <div class="bg-vanilla-50 rounded-3xl border border-lavender-300 shadow-plum-md overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-lavender-400/55 border-b border-lavender-300 text-xs font-bold uppercase tracking-wider text-plum-950">
+                <th class="py-4 px-5">Ingrediente / Insumo</th>
+                <th class="py-4 px-4 text-center">Cant. Compra</th>
+                <th class="py-4 px-4 text-center">Unidad</th>
+                <th class="py-4 px-4 text-right">Precio Paquete ($)</th>
+                <th class="py-4 px-5 text-right bg-lavender-300/60 text-plum-950">Precio Unitario</th>
+                <th class="py-4 px-4 text-center">Uso en Recetas</th>
+                <th class="py-4 px-4 text-center">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="ingredientes-tbody" class="divide-y divide-lavender-200 text-sm">
+              <!-- Renderizado dinámico -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-vanilla-50/90 border-t border-lavender-300 py-5 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-mutedplum-600">
+      <p><strong class="text-plum-900">Sweet Pengüin</strong> • Sistema de Gestión de Costos y Recetas de Pastelería</p>
+      <p>Conectado a base de datos vía <code class="font-mono text-plum-700">DB_CONFIG</code>.</p>
+    </div>
+  </footer>
+
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 1: AGREGAR NUEVO INGREDIENTE                                      -->
+  <!-- ======================================================================= -->
+  <div id="modal-new-ingredient" class="hidden fixed inset-0 z-50 bg-plum-950/55 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-vanilla-50 rounded-3xl border border-lavender-300 shadow-plum-lg max-w-md w-full p-6 space-y-5">
+      <div class="flex items-center justify-between border-b border-lavender-200 pb-3">
+        <h3 class="font-serif text-xl font-bold text-plum-950">Nuevo Ingrediente</h3>
+        <button onclick="closeModal('modal-new-ingredient')" class="p-1.5 rounded-xl hover:bg-lavender-100 text-plum-700">✕</button>
+      </div>
+      <form onsubmit="handleAddIngredient(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-plum-900 mb-1">Nombre del Ingrediente / Insumo *</label>
+          <input type="text" id="new-ing-name" required placeholder="Ej. Nueces mariposa, Esencia de vainilla..." class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-plum-900 mb-1">Cantidad de Compra *</label>
+            <input type="number" id="new-ing-qty" step="0.01" min="0.01" value="1" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-plum-900 mb-1">Unidad de Medida *</label>
+            <select id="new-ing-unit" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
+              <option value="kg">Kilogramos (kg)</option>
+              <option value="lt">Litros (lt)</option>
+              <option value="unid">Unidades (unid)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-plum-900 mb-1">Precio del Paquete / Compra ($) *</label>
+          <input type="number" id="new-ing-price" step="1" min="0" required placeholder="Ej. 12500" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-lavender-200">
+          <button type="button" onclick="closeModal('modal-new-ingredient')" class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-lavender-100 text-plum-900 hover:bg-lavender-200">Cancelar</button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-semibold bg-plum-600 text-vanilla-50 hover:bg-plum-800 shadow-plum-sm">Guardar Ingrediente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 2: CREAR NUEVO PRODUCTO / RECETA                                  -->
+  <!-- ======================================================================= -->
+  <div id="modal-new-product" class="hidden fixed inset-0 z-50 bg-plum-950/55 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-vanilla-50 rounded-3xl border border-lavender-300 shadow-plum-lg max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 bg-lavender-100 border-b border-lavender-300">
+        <div>
+          <h3 class="font-serif text-xl font-bold text-plum-950">Crear Nuevo Producto</h3>
+          <p class="text-xs text-mutedplum-600">Define el nombre, rinde, ganancia y selecciona los ingredientes.</p>
+        </div>
+        <button onclick="closeModal('modal-new-product')" class="p-1.5 rounded-xl hover:bg-lavender-200 text-plum-800">✕</button>
+      </div>
+      
+      <form onsubmit="handleAddProduct(event)" class="p-6 overflow-y-auto space-y-5 flex-1">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-plum-900 mb-1">Nombre del Producto *</label>
+            <input type="text" id="new-prod-name" required placeholder="Ej. Tarta Frutilla con Crema (26cm)" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-plum-900 mb-1">Categoría</label>
+            <select id="new-prod-cat" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
+              <option value="Tortas">Tortas (26cm + Packaging)</option>
+              <option value="Cookies y Alfajores">Cookies y Alfajores</option>
+              <option value="Budines y Bizcochuelos">Budines y Bizcochuelos</option>
+              <option value="Bases y Cremas">Bases, Cremas y Otros</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-semibold text-plum-900 mb-1">Rinde (unid) *</label>
+              <input type="number" id="new-prod-yield" min="1" step="1" value="1" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-plum-900 mb-1">Ganancia (%) *</label>
+              <input type="number" id="new-prod-margin" min="0" step="1" value="100" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Selector de Ingredientes para el Nuevo Producto -->
+        <div class="bg-lavender-50 p-4 rounded-2xl border border-lavender-300 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-plum-900">Ingredientes de la Receta</span>
+            <button type="button" onclick="addTempRecipeRow()" class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-lavender-400/50 text-plum-950 hover:bg-lavender-400/80 transition">
+              + Añadir fila
+            </button>
+          </div>
+          <div id="new-prod-ingredients-list" class="space-y-2">
+            <!-- Filas dinámicas -->
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-lavender-200">
+          <button type="button" onclick="closeModal('modal-new-product')" class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-lavender-100 text-plum-900 hover:bg-lavender-200">Cancelar</button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-semibold bg-plum-600 text-vanilla-50 hover:bg-plum-800 shadow-plum-sm">Crear Producto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 3: ESQUEMA SQL PARA BASE DE DATOS REAL                            -->
+  <!-- ======================================================================= -->
+  <div id="modal-sql" class="hidden fixed inset-0 z-50 bg-plum-950/55 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-vanilla-50 rounded-3xl border border-lavender-300 shadow-plum-lg max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 bg-lavender-100 border-b border-lavender-300">
+        <div>
+          <h3 class="font-serif text-xl font-bold text-plum-950">Esquema SQL Relacional (PostgreSQL / MySQL)</h3>
+          <p class="text-xs text-mutedplum-600">Estructura lista para conectar este frontend a tu base de datos en producción.</p>
+        </div>
+        <button onclick="closeModal('modal-sql')" class="p-1.5 rounded-xl hover:bg-lavender-200 text-plum-800">✕</button>
+      </div>
+      
+      <div class="p-6 overflow-y-auto space-y-4 flex-1">
+        <div class="flex items-center justify-between bg-plum-950 text-vanilla-100 px-4 py-2.5 rounded-t-2xl text-xs">
+          <span class="font-mono text-lavender-400">sweet_penguin_schema.sql</span>
+          <button onclick="copySqlCode()" class="px-3 py-1 rounded-lg bg-plum-600 hover:bg-plum-500 text-vanilla-50 font-semibold transition">
+            Copiar SQL
+          </button>
+        </div>
+        <pre id="sql-code-block" class="bg-plum-950 text-lavender-200 p-4 rounded-b-2xl text-xs font-mono overflow-x-auto leading-relaxed -mt-4">-- Base de Datos para Pastelería Sweet Pengüin
+-- Compatible con PostgreSQL y MySQL
+
+CREATE TABLE ingredientes (
+    id VARCHAR(50) PRIMARY KEY,
+    nombre VARCHAR(120) NOT NULL,
+    cantidad_compra DECIMAL(10, 3) NOT NULL DEFAULT 1.000,
+    unidad VARCHAR(20) NOT NULL, -- 'kg', 'lt', 'unid'
+    precio_paquete DECIMAL(12, 2) NOT NULL,
+    actualizado_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE productos (
+    id VARCHAR(50) PRIMARY KEY,
+    nombre VARCHAR(150) NOT NULL,
+    categoria VARCHAR(80) DEFAULT 'General',
+    rinde_unidades INT NOT NULL DEFAULT 1,
+    porcentaje_ganancia DECIMAL(6, 2) NOT NULL DEFAULT 100.00,
+    notas VARCHAR(255),
+    creado_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE receta_ingredientes (
+    id SERIAL PRIMARY KEY,
+    producto_id VARCHAR(50) NOT NULL,
+    ingrediente_id VARCHAR(50) NOT NULL,
+    cantidad_usada DECIMAL(10, 4) NOT NULL,
+    detalle_uso VARCHAR(100), -- Ej: 'Masa 26cm', 'Relleno', 'Packaging'
+    FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE,
+    FOREIGN KEY (ingrediente_id) REFERENCES ingredientes(id) ON DELETE RESTRICT
+);
+
+-- Vista útil para consultar costos y precios sugeridos en tiempo real
+CREATE VIEW vista_costeo_productos AS
+SELECT 
+    p.id AS producto_id,
+    p.nombre AS producto,
+    p.rinde_unidades,
+    SUM(ri.cantidad_usada * (i.precio_paquete / i.cantidad_compra)) AS costo_total_produccion,
+    p.porcentaje_ganancia,
+    SUM(ri.cantidad_usada * (i.precio_paquete / i.cantidad_compra)) * (1 + p.porcentaje_ganancia / 100) AS precio_final_sugerido,
+    CEIL((SUM(ri.cantidad_usada * (i.precio_paquete / i.cantidad_compra)) * (1 + p.porcentaje_ganancia / 100)) / p.rinde_unidades) AS precio_unitario_sugerido
+FROM productos p
+JOIN receta_ingredientes ri ON p.id = ri.producto_id
+JOIN ingredientes i ON ri.ingrediente_id = i.id
+GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 4: CONFIRMACIÓN PERSONALIZADA                                      -->
+  <!-- ======================================================================= -->
+  <div id="modal-confirm" class="hidden fixed inset-0 z-50 bg-plum-950/55 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-vanilla-50 rounded-3xl border border-lavender-300 shadow-plum-lg max-w-sm w-full p-6 space-y-4">
+      <h3 id="confirm-title" class="font-serif text-lg font-bold text-plum-950">Confirmar acción</h3>
+      <p id="confirm-message" class="text-sm text-mutedplum-600">¿Estás seguro?</p>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeModal('modal-confirm')" class="px-4 py-2 rounded-xl text-xs font-semibold bg-lavender-100 text-plum-900 hover:bg-lavender-200">Cancelar</button>
+        <button id="confirm-yes-btn" class="px-4 py-2 rounded-xl text-xs font-semibold bg-plum-600 text-vanilla-50 hover:bg-plum-800">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    // =========================================================================
+    // 1. CONFIGURACIÓN DE CONEXIÓN A TU BASE DE DATOS / API
+    // =========================================================================
+    const DB_CONFIG = {
+      endpoints: {
+        ingredientes: '/api/ingredientes',
+        productos: '/api/productos',
+        recetaItems: '/api/receta-ingredientes'
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+
+    let ingredients = [];
+    let products = [];
+    let allCollapsed = false;
+
+    async function loadFromDatabase() {
+      try {
+        const [resIng, resProd] = await Promise.all([
+          fetch(DB_CONFIG.endpoints.ingredientes, { headers: DB_CONFIG.headers }),
+          fetch(DB_CONFIG.endpoints.productos, { headers: DB_CONFIG.headers })
+        ]);
+
+        if (resIng.ok) {
+          ingredients = await resIng.json();
+        }
+        if (resProd.ok) {
+          products = await resProd.json();
+        }
+      } catch (err) {
+        console.warn('Configura DB_CONFIG.endpoints para consultar tu base de datos:', err);
+      }
+
+      updateNavBadges();
+      renderProductos();
+      renderIngredientes();
+    }
+
+    // =========================================================================
+    // 2. UTILIDADES DE FORMATO Y CÁLCULOS FINANCIEROS
+    // =========================================================================
+    const currencyFormatter = new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    });
+
+    const currencyRoundFormatter = new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    });
+
+    function formatMoney(val) {
+      if (isNaN(val) || !isFinite(val)) return '$0';
+      return Number.isInteger(Math.round(val * 100) / 100)
+        ? currencyRoundFormatter.format(val)
+        : currencyFormatter.format(val);
+    }
+
+    function getIngredientById(id) {
+      return ingredients.find(i => String(i.id) === String(id));
+    }
+
+    function getUnitPrice(ing) {
+      if (!ing || !ing.buyQty || ing.buyQty <= 0) return 0;
+      return ing.buyPrice / ing.buyQty;
+    }
+
+    function calculateProductMetrics(product) {
+      let totalCost = 0;
+      const lines = (product.ingredients || []).map((item, idx) => {
+        const ing = getIngredientById(item.ingredientId);
+        const unitPrice = ing ? getUnitPrice(ing) : 0;
+        const subtotal = unitPrice * (Number(item.qty) || 0);
+        totalCost += subtotal;
+        return {
+          index: idx,
+          id: item.id ?? null,
+          ingredientId: item.ingredientId,
+          name: ing ? ing.name : (item.name || 'Ingrediente'),
+          unit: ing ? ing.unit : (item.unit || 'unid'),
+          qty: Number(item.qty) || 0,
+          note: item.note || '',
+          unitPrice,
+          subtotal
+        };
+      });
+
+      const marginPercent = Number(product.marginPercent) || 0;
+      const profitAmount = totalCost * (marginPercent / 100);
+      const finalPrice = totalCost + profitAmount;
+      const yieldUnits = Math.max(1, Math.round(Number(product.yield) || 1));
+      const unitSuggestedPrice = Math.ceil(finalPrice / yieldUnits);
+      const unitCost = totalCost / yieldUnits;
+
+      return {
+        lines,
+        totalCost,
+        marginPercent,
+        profitAmount,
+        finalPrice,
+        yieldUnits,
+        unitSuggestedPrice,
+        unitCost
+      };
+    }
+
+    // =========================================================================
+    // 3. NAVEGACIÓN ENTRE PÁGINAS Y UI HELPERS
+    // =========================================================================
+    function switchView(viewName) {
+      const viewProd = document.getElementById('view-productos');
+      const viewIng = document.getElementById('view-ingredientes');
+      const tabProd = document.getElementById('tab-productos');
+      const tabIng = document.getElementById('tab-ingredientes');
+
+      if (viewName === 'productos') {
+        viewProd.classList.remove('hidden');
+        viewIng.classList.add('hidden');
+        tabProd.className = 'flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-plum-600 text-vanilla-50 shadow-plum-sm';
+        tabIng.className = 'flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-plum-900 hover:bg-lavender-200/70';
+        renderProductos();
+      } else {
+        viewIng.classList.remove('hidden');
+        viewProd.classList.add('hidden');
+        tabIng.className = 'flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-plum-600 text-vanilla-50 shadow-plum-sm';
+        tabProd.className = 'flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-plum-900 hover:bg-lavender-200/70';
+        renderIngredientes();
+      }
+    }
+
+    function updateNavBadges() {
+      document.getElementById('badge-productos-count').textContent = products.length;
+      document.getElementById('badge-ingredientes-count').textContent = ingredients.length;
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bgClass = type === 'error'
+        ? 'bg-rose-700 text-white'
+        : 'bg-plum-900 text-vanilla-50 border border-lavender-400/50';
+      toast.className = `${bgClass} px-4 py-2.5 rounded-2xl shadow-plum-lg text-xs font-medium flex items-center gap-2 transition-all duration-300 translate-y-2 opacity-0`;
+      toast.innerHTML = `<span>${type === 'error' ? '⚠️' : '🐧'}</span><span>${message}</span>`;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 2400);
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function customConfirm(title, message, onConfirm) {
+      document.getElementById('confirm-title').textContent = title;
+      document.getElementById('confirm-message').textContent = message;
+      const yesBtn = document.getElementById('confirm-yes-btn');
+      yesBtn.onclick = () => {
+        closeModal('modal-confirm');
+        onConfirm();
+      };
+      openModal('modal-confirm');
+    }
+
+    // =========================================================================
+    // 4. PÁGINA 1: RENDERIZADO Y LÓGICA DE MATERIA PRIMA
+    // =========================================================================
+    function countIngredientUsage(ingId) {
+      return products.filter(p => (p.ingredients || []).some(item => String(item.ingredientId) === String(ingId))).length;
+    }
+
+    function renderIngredientes() {
+      const tbody = document.getElementById('ingredientes-tbody');
+      const search = (document.getElementById('search-ingredientes').value || '').toLowerCase().trim();
+      const unitFilter = document.getElementById('filter-unidad').value;
+
+      const filtered = ingredients.filter(ing => {
+        const matchesSearch = String(ing.name || '').toLowerCase().includes(search);
+        const matchesUnit = unitFilter === 'all' || ing.unit === unitFilter;
+        return matchesSearch && matchesUnit;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-12 text-center text-mutedplum-600">
+              No hay ingredientes cargados o no coinciden con el filtro.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((ing, idx) => {
+        const unitPrice = getUnitPrice(ing);
+        const usageCount = countIngredientUsage(ing.id);
+        const rowBg = idx % 2 === 1 ? 'bg-lavender-50/60' : 'bg-vanilla-50';
+
+        return `
+          <tr class="${rowBg} hover:bg-lavender-100/75 transition-colors group">
+            <td class="py-3.5 px-5 font-semibold text-plum-950">
+              <input 
+                type="text" 
+                value="${String(ing.name || '').replace(/"/g, '&quot;')}" 
+                onchange="updateIngredientField('${ing.id}', 'name', this.value)"
+                class="w-full bg-transparent border border-transparent hover:border-lavender-300 focus:border-plum-500 focus:bg-white rounded-lg px-2 py-1 font-semibold text-plum-950 focus:outline-none transition"
+              />
+            </td>
+            <td class="py-3.5 px-4 text-center">
+              <input 
+                type="number" 
+                step="0.01" 
+                min="0.01" 
+                value="${ing.buyQty}" 
+                onchange="updateIngredientField('${ing.id}', 'buyQty', this.value)"
+                class="w-24 text-center px-2.5 py-1.5 rounded-xl bg-white border border-lavender-300 font-medium text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500"
+              />
+            </td>
+            <td class="py-3.5 px-4 text-center">
+              <select 
+                onchange="updateIngredientField('${ing.id}', 'unit', this.value)"
+                class="px-2.5 py-1.5 rounded-xl bg-lavender-100 border border-lavender-300 text-xs font-semibold text-plum-900 focus:outline-none focus:ring-2 focus:ring-plum-500"
+              >
+                <option value="kg" ${ing.unit === 'kg' ? 'selected' : ''}>kg</option>
+                <option value="lt" ${ing.unit === 'lt' ? 'selected' : ''}>lt</option>
+                <option value="unid" ${ing.unit === 'unid' ? 'selected' : ''}>unid</option>
+              </select>
+            </td>
+            <td class="py-3.5 px-4 text-right">
+              <div class="inline-flex items-center bg-white border border-lavender-300 rounded-xl px-2.5 py-1 focus-within:ring-2 focus-within:ring-plum-500">
+                <span class="text-mutedplum-600 text-xs mr-1">$</span>
+                <input 
+                  type="number" 
+                  step="1" 
+                  min="0" 
+                  value="${ing.buyPrice}" 
+                  onchange="updateIngredientField('${ing.id}', 'buyPrice', this.value)"
+                  class="w-28 text-right font-semibold text-plum-950 focus:outline-none bg-transparent"
+                />
+              </div>
+            </td>
+            <td class="py-3.5 px-5 text-right bg-lavender-100/65 font-bold text-plum-950">
+              <span class="text-base text-plum-600">${formatMoney(unitPrice)}</span>
+              <span class="text-xs font-normal text-mutedplum-600">/ ${ing.unit}</span>
+            </td>
+            <td class="py-3.5 px-4 text-center">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${usageCount > 0 ? 'bg-lavender-200 text-plum-900' : 'bg-vanilla-200 text-mutedplum-600'}">
+                ${usageCount} ${usageCount === 1 ? 'receta' : 'recetas'}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-center">
+              <button 
+                onclick="deleteIngredient('${ing.id}')" 
+                title="Eliminar ingrediente"
+                class="p-2 rounded-xl text-mutedplum-600 hover:text-rose-700 hover:bg-rose-100 transition"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function updateIngredientField(id, field, rawValue) {
+      const ing = getIngredientById(id);
+      if (!ing) return;
+
+      if (field === 'name') {
+        const trimmed = rawValue.trim();
+        if (!trimmed) return;
+        ing.name = trimmed;
+      } else if (field === 'unit') {
+        ing.unit = rawValue;
+      } else if (field === 'buyQty') {
+        const num = parseFloat(rawValue);
+        if (isNaN(num) || num <= 0) {
+          showToast('La cantidad debe ser mayor a 0', 'error');
+          renderIngredientes();
+          return;
+        }
+        ing.buyQty = num;
+      } else if (field === 'buyPrice') {
+        const num = parseFloat(rawValue);
+        if (isNaN(num) || num < 0) {
+          showToast('El precio no puede ser negativo', 'error');
+          renderIngredientes();
+          return;
+        }
+        ing.buyPrice = num;
+      }
+
+      try {
+        await fetch(`${DB_CONFIG.endpoints.ingredientes}/${id}`, {
+          method: 'PUT',
+          headers: DB_CONFIG.headers,
+          body: JSON.stringify(ing)
+        });
+      } catch (_) {}
+
+      renderIngredientes();
+      renderProductos();
+      showToast(`"${ing.name}" actualizado (${formatMoney(getUnitPrice(ing))}/${ing.unit})`);
+    }
+
+    async function deleteIngredient(id) {
+      const ing = getIngredientById(id);
+      if (!ing) return;
+      const usageCount = countIngredientUsage(id);
+
+      if (usageCount > 0) {
+        showToast(`No se puede eliminar: se usa en ${usageCount} receta(s)`, 'error');
+        return;
+      }
+
+      customConfirm(
+        'Eliminar ingrediente',
+        `¿Seguro que deseas eliminar "${ing.name}" de la base de datos?`,
+        async () => {
+          ingredients = ingredients.filter(i => String(i.id) !== String(id));
+          try {
+            await fetch(`${DB_CONFIG.endpoints.ingredientes}/${id}`, {
+              method: 'DELETE',
+              headers: DB_CONFIG.headers
+            });
+          } catch (_) {}
+          updateNavBadges();
+          renderIngredientes();
+          showToast(`"${ing.name}" eliminado`);
+        }
+      );
+    }
+
+    function openNewIngredientModal() {
+      document.getElementById('new-ing-name').value = '';
+      document.getElementById('new-ing-qty').value = '1';
+      document.getElementById('new-ing-unit').value = 'kg';
+      document.getElementById('new-ing-price').value = '';
+      openModal('modal-new-ingredient');
+    }
+
+    async function handleAddIngredient(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-ing-name').value.trim();
+      const buyQty = parseFloat(document.getElementById('new-ing-qty').value);
+      const unit = document.getElementById('new-ing-unit').value;
+      const buyPrice = parseFloat(document.getElementById('new-ing-price').value);
+
+      if (!name || isNaN(buyQty) || buyQty <= 0 || isNaN(buyPrice) || buyPrice < 0) {
+        showToast('Completa todos los campos correctamente', 'error');
+        return;
+      }
+
+      const payload = {
+        id: 'ing_' + Date.now(),
+        name,
+        buyQty,
+        buyPrice,
+        unit
+      };
+
+      try {
+        const res = await fetch(DB_CONFIG.endpoints.ingredientes, {
+          method: 'POST',
+          headers: DB_CONFIG.headers,
+          body: JSON.stringify(payload)
+        });
+        const created = res.ok ? await res.json() : payload;
+        ingredients.unshift(created);
+      } catch (_) {
+        ingredients.unshift(payload);
+      }
+
+      updateNavBadges();
+      closeModal('modal-new-ingredient');
+      renderIngredientes();
+      showToast(`Ingrediente "${name}" agregado`);
+    }
+
+    // =========================================================================
+    // 5. PÁGINA 2: RENDERIZADO Y LÓGICA DE PRODUCTOS Y RECETAS
+    // =========================================================================
+    function renderProductos() {
+      const grid = document.getElementById('productos-grid');
+      const kpiContainer = document.getElementById('productos-kpis');
+      const search = (document.getElementById('search-productos').value || '').toLowerCase().trim();
+      const categoryFilter = document.getElementById('filter-category').value;
+
+      let avgMargin = 0;
+      let highestProfitProduct = { name: '-', profit: 0 };
+      products.forEach(p => {
+        const m = calculateProductMetrics(p);
+        avgMargin += m.marginPercent;
+        if (m.profitAmount > highestProfitProduct.profit) {
+          highestProfitProduct = { name: String(p.name || '').split('(')[0].trim(), profit: m.profitAmount };
+        }
+      });
+      avgMargin = products.length ? Math.round(avgMargin / products.length) : 0;
+
+      kpiContainer.innerHTML = `
+        <div class="bg-vanilla-50/95 rounded-2xl p-3.5 border border-lavender-300 shadow-plum-sm">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-mutedplum-600">Total Recetas</p>
+          <p class="text-xl font-bold text-plum-950 mt-0.5">${products.length} productos</p>
+        </div>
+        <div class="bg-vanilla-50/95 rounded-2xl p-3.5 border border-lavender-300 shadow-plum-sm">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-mutedplum-600">Insumos Activos</p>
+          <p class="text-xl font-bold text-plum-950 mt-0.5">${ingredients.length} materias primas</p>
+        </div>
+        <div class="bg-vanilla-50/95 rounded-2xl p-3.5 border border-lavender-300 shadow-plum-sm">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-mutedplum-600">Margen Promedio</p>
+          <p class="text-xl font-bold text-plum-600 mt-0.5">+${avgMargin}%</p>
+        </div>
+        <div class="bg-vanilla-50/95 rounded-2xl p-3.5 border border-lavender-300 shadow-plum-sm">
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-mutedplum-600">Mayor Ganancia ($)</p>
+          <p class="text-sm sm:text-base font-bold text-plum-800 mt-1 truncate" title="${highestProfitProduct.name}">${highestProfitProduct.name}</p>
+        </div>
+      `;
+
+      const filtered = products.filter(prod => {
+        const matchesCat = categoryFilter === 'all' || prod.category === categoryFilter;
+        const inName = String(prod.name || '').toLowerCase().includes(search);
+        const inIngredients = (prod.ingredients || []).some(item => {
+          const ing = getIngredientById(item.ingredientId);
+          return ing && String(ing.name || '').toLowerCase().includes(search);
+        });
+        return matchesCat && (inName || inIngredients);
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full bg-vanilla-50 rounded-3xl p-12 text-center border border-lavender-300 shadow-plum-sm">
+            <p class="text-lg font-serif font-semibold text-plum-900">No hay productos para mostrar</p>
+            <p class="text-sm text-mutedplum-600 mt-1">Conecta tu base de datos, ajusta los filtros o crea una nueva receta.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(prod => {
+        const metrics = calculateProductMetrics(prod);
+        const optionsHtml = ingredients.map(ing => 
+          `<option value="${ing.id}">${ing.name} (${formatMoney(getUnitPrice(ing))}/${ing.unit})</option>`
+        ).join('');
+
+        return `
+          <article class="bg-vanilla-50 rounded-3xl border border-lavender-300 shadow-plum-md hover:shadow-plum-lg transition-shadow flex flex-col overflow-hidden">
+            
+            <!-- Cabecera Lavanda Pastel estilo Sweet Pengüin -->
+            <div class="p-5 bg-gradient-to-r from-lavender-400/55 via-lavender-200/75 to-lavender-400/45 border-b border-lavender-300">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-vanilla-50/90 text-plum-800 border border-lavender-300 mb-1.5">
+                    ${prod.category || 'Pastelería'}
+                  </span>
+                  <h3 class="font-serif text-xl font-bold text-plum-950 leading-snug">${prod.name}</h3>
+                </div>
+                <button onclick="deleteProduct('${prod.id}')" title="Eliminar producto" class="p-2 rounded-xl text-plum-800/60 hover:text-rose-700 hover:bg-vanilla-50/80 transition shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+              </div>
+
+              <!-- Controles Rápidos de Rinde y Ganancia -->
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 pt-3 border-t border-plum-600/15">
+                <div class="bg-vanilla-50/95 px-3 py-2 rounded-2xl border border-lavender-300">
+                  <label class="block text-[10px] font-bold uppercase tracking-wider text-mutedplum-600">Rinde (Unid.)</label>
+                  <div class="flex items-center gap-1 mt-0.5">
+                    <input 
+                      type="number" 
+                      min="1" 
+                      step="1" 
+                      value="${metrics.yieldUnits}" 
+                      onchange="updateProductMeta('${prod.id}', 'yield', this.value)"
+                      class="w-full font-bold text-sm text-plum-950 bg-transparent focus:outline-none focus:text-plum-600"
+                    />
+                    <span class="text-xs text-mutedplum-600">unid</span>
+                  </div>
+                </div>
+
+                <div class="bg-vanilla-50/95 px-3 py-2 rounded-2xl border border-lavender-300">
+                  <label class="block text-[10px] font-bold uppercase tracking-wider text-mutedplum-600">Ganancia (+ %)</label>
+                  <div class="flex items-center gap-1 mt-0.5">
+                    <input 
+                      type="number" 
+                      min="0" 
+                      step="1" 
+                      value="${metrics.marginPercent}" 
+                      onchange="updateProductMeta('${prod.id}', 'marginPercent', this.value)"
+                      class="w-full font-bold text-sm text-plum-600 bg-transparent focus:outline-none focus:text-plum-950"
+                    />
+                    <span class="text-xs font-bold text-plum-600">%</span>
+                  </div>
+                </div>
+
+                <div class="col-span-2 sm:col-span-1 bg-vanilla-50/95 px-3 py-2 rounded-2xl border border-lavender-300 flex flex-col justify-center">
+                  <span class="block text-[10px] font-bold uppercase tracking-wider text-mutedplum-600">Costo Unitario</span>
+                  <span class="font-semibold text-sm text-plum-900 mt-0.5">${formatMoney(metrics.unitCost)} <span class="text-[11px] font-normal text-mutedplum-600">/u</span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tabla Desglosada de Ingredientes -->
+            <div class="recipe-body ${allCollapsed ? 'hidden' : ''} flex-1 flex flex-col justify-between">
+              <div class="divide-y divide-lavender-200/80">
+                ${metrics.lines.map(line => `
+                  <div class="py-2 px-4 hover:bg-lavender-50/80 transition-colors flex items-center justify-between gap-2">
+                    <div class="min-w-0 flex-1 flex items-center gap-1.5">
+                      <span class="text-xs sm:text-sm font-semibold text-plum-950 truncate" title="${line.name}${line.note ? ' — ' + line.note : ''}">${line.name}</span>
+                      ${line.note ? `<span class="hidden sm:inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-lavender-100 text-plum-700 shrink-0">${line.note}</span>` : ''}
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                      <div class="inline-flex items-center bg-white border border-lavender-300 rounded-lg px-1.5 py-0.5 focus-within:ring-2 focus-within:ring-plum-500">
+                        <input 
+                          type="number" 
+                          step="0.005" 
+                          min="0" 
+                          value="${line.qty}" 
+                          onchange="updateRecipeIngredientQty('${prod.id}', ${line.index}, this.value)"
+                          title="P. Unitario: ${formatMoney(line.unitPrice)} / ${line.unit}"
+                          class="w-16 text-right font-semibold text-plum-950 bg-transparent focus:outline-none text-xs"
+                        />
+                        <span class="text-[11px] font-medium text-mutedplum-600 ml-1">${line.unit}</span>
+                      </div>
+                      <span class="text-xs font-bold text-plum-950 w-20 text-right tabular-nums" title="P. Unitario: ${formatMoney(line.unitPrice)} / ${line.unit}">${formatMoney(line.subtotal)}</span>
+                      <button onclick="removeIngredientFromProduct('${prod.id}', ${line.index})" title="Quitar de la receta" class="text-mutedplum-600/60 hover:text-rose-700 p-1 rounded-lg transition text-xs leading-none">
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+
+              <!-- Agregar Ingrediente Rápido a esta Receta -->
+              <div class="px-4 py-3 bg-lavender-50/90 border-t border-lavender-200 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <select id="add-ing-select-${prod.id}" class="w-full sm:flex-1 min-w-0 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs font-medium text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
+                  ${optionsHtml}
+                </select>
+                <div class="flex items-center gap-2 shrink-0">
+                  <input type="number" id="add-ing-qty-${prod.id}" step="0.01" min="0.001" placeholder="Cant." class="w-24 sm:w-24 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs font-semibold text-plum-950 text-center focus:outline-none focus:ring-2 focus:ring-plum-500">
+                  <button onclick="addIngredientToProduct('${prod.id}')" class="px-4 py-2 rounded-xl bg-plum-600 hover:bg-plum-800 text-vanilla-50 font-semibold text-xs whitespace-nowrap shadow-plum-sm transition cursor-pointer">
+                    + Sumar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pie Financiero de la Tarjeta -->
+            <div class="px-4 py-3 bg-lavender-100/80 border-t border-lavender-300">
+              <div class="bg-plum-900 text-vanilla-50 rounded-2xl px-3 py-2.5 shadow-plum-sm flex items-center justify-between gap-2 overflow-x-auto whitespace-nowrap">
+                
+                <div class="flex items-center gap-1 shrink-0">
+                  <span class="text-[10px] uppercase tracking-wide text-lavender-300 font-semibold">Costo:</span>
+                  <span class="text-xs font-bold text-vanilla-50">${formatMoney(metrics.totalCost)}</span>
+                </div>
+
+                <span class="text-lavender-400/40 select-none shrink-0">|</span>
+
+                <div class="flex items-center gap-1 shrink-0">
+                  <span class="text-[10px] uppercase tracking-wide text-lavender-300 font-semibold">Gan. (+${metrics.marginPercent}%):</span>
+                  <span class="text-xs font-bold text-lavender-200">+${formatMoney(metrics.profitAmount)}</span>
+                </div>
+
+                <span class="text-lavender-400/40 select-none shrink-0">|</span>
+
+                <div class="flex items-center gap-1 shrink-0">
+                  <span class="text-[10px] uppercase tracking-wide text-lavender-200 font-bold">Final:</span>
+                  <span class="text-xs sm:text-sm font-extrabold text-vanilla-50">${formatMoney(metrics.finalPrice)}</span>
+                </div>
+
+                ${metrics.yieldUnits > 1 ? `
+                  <span class="text-lavender-400/40 select-none shrink-0">|</span>
+                  <div class="flex items-center gap-1 bg-plum-800 border border-lavender-400/35 px-2 py-1 rounded-xl shrink-0">
+                    <span class="text-[10px] uppercase tracking-wide text-lavender-200 font-semibold">x Unid (${metrics.yieldUnits}u):</span>
+                    <span class="text-xs font-extrabold text-vanilla-50">${formatMoney(metrics.unitSuggestedPrice)}</span>
+                  </div>
+                ` : ''}
+
+              </div>
+            </div>
+
+          </article>
+        `;
+      }).join('');
+    }
+
+    function toggleAllCards() {
+      allCollapsed = !allCollapsed;
+      renderProductos();
+    }
+
+    async function updateProductMeta(prodId, field, rawValue) {
+      const prod = products.find(p => String(p.id) === String(prodId));
+      if (!prod) return;
+      const num = parseFloat(rawValue);
+      if (isNaN(num) || num < 0) return;
+
+      if (field === 'yield') {
+        prod.yield = Math.max(1, Math.round(num));
+      } else if (field === 'marginPercent') {
+        prod.marginPercent = num;
+      }
+
+      try {
+        await fetch(`${DB_CONFIG.endpoints.productos}/${prodId}`, {
+          method: 'PATCH',
+          headers: DB_CONFIG.headers,
+          body: JSON.stringify({ yield: prod.yield, marginPercent: prod.marginPercent })
+        });
+      } catch (_) {}
+
+      renderProductos();
+      showToast('Producto actualizado');
+    }
+
+    async function updateRecipeIngredientQty(prodId, lineIndex, rawValue) {
+      const prod = products.find(p => String(p.id) === String(prodId));
+      if (!prod || !prod.ingredients[lineIndex]) return;
+      const num = parseFloat(rawValue);
+      if (isNaN(num) || num < 0) return;
+
+      const item = prod.ingredients[lineIndex];
+      item.qty = num;
+
+      try {
+        await fetch(`${DB_CONFIG.endpoints.recetaItems}/${item.id ?? lineIndex}`, {
+          method: 'PATCH',
+          headers: DB_CONFIG.headers,
+          body: JSON.stringify({ productoId: prodId, ingredientId: item.ingredientId, qty: num })
+        });
+      } catch (_) {}
+
+      renderProductos();
+      showToast('Cantidad actualizada');
+    }
+
+    async function removeIngredientFromProduct(prodId, lineIndex) {
+      const prod = products.find(p => String(p.id) === String(prodId));
+      if (!prod) return;
+      const [removed] = prod.ingredients.splice(lineIndex, 1);
+
+      try {
+        await fetch(`${DB_CONFIG.endpoints.recetaItems}/${removed?.id ?? lineIndex}`, {
+          method: 'DELETE',
+          headers: DB_CONFIG.headers
+        });
+      } catch (_) {}
+
+      renderProductos();
+      showToast('Ingrediente quitado de la receta');
+    }
+
+    async function addIngredientToProduct(prodId) {
+      const prod = products.find(p => String(p.id) === String(prodId));
+      if (!prod) return;
+      const selectEl = document.getElementById(`add-ing-select-${prodId}`);
+      const qtyEl = document.getElementById(`add-ing-qty-${prodId}`);
+      const ingredientId = selectEl.value;
+      const qty = parseFloat(qtyEl.value);
+
+      if (!ingredientId || isNaN(qty) || qty <= 0) {
+        showToast('Ingresa una cantidad válida mayor a 0', 'error');
+        return;
+      }
+
+      prod.ingredients = prod.ingredients || [];
+      const newItem = { id: 'item_' + Date.now(), ingredientId, qty };
+
+      try {
+        const res = await fetch(DB_CONFIG.endpoints.recetaItems, {
+          method: 'POST',
+          headers: DB_CONFIG.headers,
+          body: JSON.stringify({ productoId: prodId, ...newItem })
+        });
+        prod.ingredients.push(res.ok ? await res.json() : newItem);
+      } catch (_) {
+        prod.ingredients.push(newItem);
+      }
+
+      renderProductos();
+      showToast('Ingrediente sumado a la receta');
+    }
+
+    async function deleteProduct(prodId) {
+      const prod = products.find(p => String(p.id) === String(prodId));
+      if (!prod) return;
+
+      customConfirm(
+        'Eliminar producto',
+        `¿Estás seguro de eliminar "${prod.name}" de tu catálogo?`,
+        async () => {
+          products = products.filter(p => String(p.id) !== String(prodId));
+          try {
+            await fetch(`${DB_CONFIG.endpoints.productos}/${prodId}`, {
+              method: 'DELETE',
+              headers: DB_CONFIG.headers
+            });
+          } catch (_) {}
+          updateNavBadges();
+          renderProductos();
+          showToast(`"${prod.name}" eliminado`);
+        }
+      );
+    }
+
+    // =========================================================================
+    // 6. CREACIÓN DE NUEVO PRODUCTO DESDE MODAL
+    // =========================================================================
+    function openNewProductModal() {
+      document.getElementById('new-prod-name').value = '';
+      document.getElementById('new-prod-yield').value = '1';
+      document.getElementById('new-prod-margin').value = '100';
+      const list = document.getElementById('new-prod-ingredients-list');
+      list.innerHTML = '';
+      addTempRecipeRow();
+      openModal('modal-new-product');
+    }
+
+    function addTempRecipeRow() {
+      const list = document.getElementById('new-prod-ingredients-list');
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2 temp-recipe-row';
+      const optionsHtml = ingredients.map(ing => 
+        `<option value="${ing.id}">${ing.name} (${ing.unit})</option>`
+      ).join('');
+
+      row.innerHTML = `
+        <select class="temp-ing-id flex-1 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs text-plum-950">
+          ${optionsHtml}
+        </select>
+        <input type="number" step="0.005" min="0.001" placeholder="Cantidad" required class="temp-ing-qty w-24 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs text-plum-950 text-center">
+        <button type="button" onclick="this.parentElement.remove()" class="p-2 text-mutedplum-600 hover:text-rose-700 text-xs">✕</button>
+      `;
+      list.appendChild(row);
+    }
+
+    async function handleAddProduct(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-prod-name').value.trim();
+      const category = document.getElementById('new-prod-cat').value;
+      const yieldVal = Math.max(1, parseInt(document.getElementById('new-prod-yield').value, 10) || 1);
+      const marginPercent = parseFloat(document.getElementById('new-prod-margin').value) || 0;
+
+      const rows = document.querySelectorAll('.temp-recipe-row');
+      const recipeItems = [];
+      rows.forEach((row, idx) => {
+        const ingredientId = row.querySelector('.temp-ing-id').value;
+        const qty = parseFloat(row.querySelector('.temp-ing-qty').value);
+        if (ingredientId && !isNaN(qty) && qty > 0) {
+          recipeItems.push({ id: 'item_' + Date.now() + '_' + idx, ingredientId, qty });
+        }
+      });
+
+      if (!name || recipeItems.length === 0) {
+        showToast('Agrega un nombre y al menos un ingrediente con cantidad', 'error');
+        return;
+      }
+
+      const payload = {
+        id: 'prod_' + Date.now(),
+        name,
+        category,
+        yield: yieldVal,
+        marginPercent,
+        ingredients: recipeItems
+      };
+
+      try {
+        const res = await fetch(DB_CONFIG.endpoints.productos, {
+          method: 'POST',
+          headers: DB_CONFIG.headers,
+          body: JSON.stringify(payload)
+        });
+        products.unshift(res.ok ? await res.json() : payload);
+      } catch (_) {
+        products.unshift(payload);
+      }
+
+      updateNavBadges();
+      closeModal('modal-new-product');
+      renderProductos();
+      showToast(`Producto "${name}" creado`);
+    }
+
+    // =========================================================================
+    // 7. MODAL ESQUEMA SQL
+    // =========================================================================
+    function openSqlModal() {
+      openModal('modal-sql');
+    }
+
+    function copySqlCode() {
+      const codeText = document.getElementById('sql-code-block').innerText;
+      const textArea = document.createElement('textarea');
+      textArea.value = codeText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showToast('Código SQL copiado al portapapeles');
+      } catch (err) {
+        showToast('No se pudo copiar automáticamente', 'error');
+      }
+      document.body.removeChild(textArea);
+    }
+
+    // =========================================================================
+    // 8. INICIALIZACIÓN AL CARGAR LA PÁGINA
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      loadFromDatabase();
+    });
+  </script>
+</body>
+</html>
