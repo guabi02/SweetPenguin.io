@@ -144,7 +144,7 @@
                 <h1 class="font-serif text-xl sm:text-2xl font-bold text-plum-900 tracking-tight">Sweet Pengüin</h1>
                 <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-lavender-100 text-plum-700 border border-lavender-300">
                   <span class="w-1.5 h-1.5 rounded-full bg-plum-600 animate-pulse"></span>
-                  Modo Base de Datos
+                  Base de Datos Activa
                 </span>
               </div>
               <p class="text-xs text-mutedplum-600">Pastelería Artesanal • Costeo y Rentabilidad</p>
@@ -156,8 +156,8 @@
             <button onclick="openSqlModal()" title="Ver Esquema SQL" class="p-2 rounded-xl bg-lavender-100 text-plum-800 border border-lavender-300 hover:bg-lavender-200 transition text-xs font-semibold">
               SQL
             </button>
-            <button onclick="loadFromDatabase()" title="Recargar desde BD" class="p-2 rounded-xl bg-lavender-100 text-plum-800 border border-lavender-300 hover:bg-lavender-200 transition text-xs font-semibold">
-              Recargar
+            <button onclick="exportDataCSV()" title="Exportar CSV" class="p-2 rounded-xl bg-lavender-100 text-plum-800 border border-lavender-300 hover:bg-lavender-200 transition text-xs font-semibold">
+              CSV
             </button>
           </div>
         </div>
@@ -167,24 +167,40 @@
           <button id="tab-productos" onclick="switchView('productos')" class="flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-plum-600 text-vanilla-50 shadow-plum-sm">
             <span>🧁</span>
             <span>Productos y Recetas</span>
-            <span id="badge-productos-count" class="ml-1 px-2 py-0.5 text-xs rounded-full bg-plum-900 text-vanilla-50">0</span>
+            <span id="badge-productos-count" class="ml-1 px-2 py-0.5 text-xs rounded-full bg-plum-900 text-vanilla-50">15</span>
           </button>
           <button id="tab-ingredientes" onclick="switchView('ingredientes')" class="flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-plum-900 hover:bg-lavender-200/70">
             <span>🧈</span>
             <span>Materia Prima</span>
-            <span id="badge-ingredientes-count" class="ml-1 px-2 py-0.5 text-xs rounded-full bg-lavender-400/60 text-plum-950">0</span>
+            <span id="badge-ingredientes-count" class="ml-1 px-2 py-0.5 text-xs rounded-full bg-lavender-400/60 text-plum-950">23</span>
           </button>
         </nav>
 
         <!-- Acciones Globales Desktop -->
         <div class="hidden md:flex items-center gap-2">
           <button onclick="openSqlModal()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-lavender-100 hover:bg-lavender-200 text-plum-800 border border-lavender-300 transition">
-            <svg class="w-4 h-4 text-plum-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582 4 8 4s8-1.79 8-4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+            <svg class="w-4 h-4 text-plum-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
             Esquema SQL
           </button>
-          <button onclick="loadFromDatabase()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-lavender-400/35 hover:bg-lavender-400/60 text-plum-900 border border-lavender-400 transition" title="Recargar datos desde la base de datos">
+          <div class="relative group">
+            <button class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-lavender-100 hover:bg-lavender-200 text-plum-800 border border-lavender-300 transition">
+              <svg class="w-4 h-4 text-plum-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              Exportar
+            </button>
+            <div class="hidden group-hover:block absolute right-0 mt-1 w-44 bg-vanilla-50 rounded-2xl shadow-plum-lg border border-lavender-300 py-1.5 z-40">
+              <button onclick="exportDataJSON()" class="w-full text-left px-4 py-2 text-xs font-medium text-plum-900 hover:bg-lavender-100 flex items-center justify-between">
+                <span>Descargar JSON</span>
+                <span class="text-[10px] text-mutedplum-600">.json</span>
+              </button>
+              <button onclick="exportDataCSV()" class="w-full text-left px-4 py-2 text-xs font-medium text-plum-900 hover:bg-lavender-100 flex items-center justify-between">
+                <span>Descargar Excel/CSV</span>
+                <span class="text-[10px] text-mutedplum-600">.csv</span>
+              </button>
+            </div>
+          </div>
+          <button onclick="confirmRestoreDefault()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-lavender-400/35 hover:bg-lavender-400/60 text-plum-900 border border-lavender-400 transition" title="Restaurar valores originales del Excel">
             <svg class="w-4 h-4 text-plum-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-            Recargar BD
+            Restaurar Excel
           </button>
         </div>
 
@@ -562,6 +578,18 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
       renderIngredientes();
     }
 
+    function exportDataJson() {
+      const payload = JSON.stringify({ ingredients, products }, null, 2);
+      const blob = new Blob([payload], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sweet_penguin_datos.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Datos exportados correctamente');
+    }
+
     // =========================================================================
     // 2. UTILIDADES DE FORMATO Y CÁLCULOS FINANCIEROS
     // =========================================================================
@@ -637,6 +665,10 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
     // =========================================================================
     // 3. NAVEGACIÓN ENTRE PÁGINAS Y UI HELPERS
     // =========================================================================
+    const baseTabClass = 'w-44 sm:w-48 h-12 px-4 rounded-[22px] flex items-center justify-between gap-2 text-xs font-bold leading-tight transition-all duration-200 cursor-pointer';
+    const activeTabClass = `${baseTabClass} bg-plum-600 text-vanilla-50 shadow-plum-sm`;
+    const inactiveTabClass = `${baseTabClass} text-plum-950 hover:bg-lavender-200/70`;
+
     function switchView(viewName) {
       const viewProd = document.getElementById('view-productos');
       const viewIng = document.getElementById('view-ingredientes');
