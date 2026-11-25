@@ -62,27 +62,49 @@
   const SUPABASE_KEY = "sb_publishable_nnEgBCI3BHMjT-8bKrmvyw_DlwwIlI8";
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  async function cargarDatos() {
-    const { data: materias_primas, error: errMp } = await db
-      .from("materias_primas")
-      .select("*")
-      .order("id", { ascending: true });
+async function cargarDatos() {
+  const { data: materias_primas, error: errMp } = await db
+    .from("materias_primas")
+    .select("*")
+    .order("id", { ascending: true });
 
-    const { data: productos, error: errProd } = await db
-      .from("productos")
-      .select("*, receta_ingredientes(*)")
-      .order("id", { ascending: true });
+  const { data: productos, error: errProd } = await db
+    .from("productos")
+    .select("*, receta_ingredientes(*)")
+    .order("id", { ascending: true });
 
-    if (errMp || errProd) {
-      console.error("Error cargando desde Supabase:", errMp || errProd);
-      return;
-    }
-
-    console.log("Materias primas:", materias_primas);
-    console.log("Productos y recetas:", productos);
+  if (errMp || errProd) {
+    console.error("Error cargando desde Supabase:", errMp || errProd);
+    showToast("No se pudieron cargar los datos de Supabase", "error");
+    return;
   }
 
-  cargarDatos();
+  ingredients = (materias_primas || []).map(r => ({
+    id: r.id,
+    name: r.name ?? r.nombre ?? "",
+    buyQty: Number(r.buyQty ?? r.cantidad_compra ?? 1),
+    buyPrice: Number(r.buyPrice ?? r.precio_paquete ?? 0),
+    unit: r.unit ?? r.unidad ?? "kg"
+  }));
+
+  products = (productos || []).map(p => ({
+    id: p.id,
+    name: p.name ?? p.nombre ?? "",
+    category: p.category ?? p.categoria ?? "General",
+    yield: Number(p.yield ?? p.rinde_unidades ?? 1),
+    marginPercent: Number(p.marginPercent ?? p.porcentaje_ganancia ?? 0),
+    ingredients: (p.receta_ingredientes || []).map(item => ({
+      id: item.id,
+      ingredientId: item.ingredientId ?? item.materia_prima_id ?? item.ingrediente_id,
+      qty: Number(item.qty ?? item.cantidad_usada ?? 0),
+      note: item.note ?? item.detalle_uso ?? ""
+    }))
+  }));
+
+  updateNavBadges();
+  renderProductos();
+  renderIngredientes();
+}
 
   </script>
   <style>
