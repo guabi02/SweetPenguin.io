@@ -392,8 +392,8 @@
         id: r.id,
         name: r.name ?? r.nombre ?? "",
         buyQty: Number(r.buyQty ?? r.cantidad_compra ?? 1),
-        buyPrice: Number(r.buyPrice ?? r.precio_paquete ?? 0),
-        unit: r.unit ?? r.unidad ?? "kg"
+        buyPrice: Number(r.buyPrice ?? r.precio_compra ?? 0),
+        unit: r.unit ?? r.unidad_medida ?? "kg"
       }));
 
       products = (productos || []).map(p => ({
