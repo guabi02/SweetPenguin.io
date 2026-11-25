@@ -63,7 +63,7 @@
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   async function cargarDatos() {
-    const { data: materias, error: errMp } = await db
+    const { data: materias_primas, error: errMp } = await db
       .from("materias_primas")
       .select("*")
       .order("id", { ascending: true });
@@ -78,7 +78,7 @@
       return;
     }
 
-    console.log("Materias primas:", materias);
+    console.log("Materias primas:", materias_primas);
     console.log("Productos y recetas:", productos);
   }
 
