@@ -465,6 +465,8 @@
         };
       });
 
+      lines.sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
+      
       const marginPercent = Number(product.marginPercent) || 0;
       const profitAmount = totalCost * (marginPercent / 100);
       const finalPrice = totalCost + profitAmount;
