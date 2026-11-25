@@ -8,6 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
     tailwind.config = {
       theme: {
@@ -52,6 +55,35 @@
         }
       }
     }
+
+
+
+  const SUPABASE_URL = "TU_PROJECT_URL";
+  const SUPABASE_KEY = "TU_ANON_OR_PUBLISHABLE_KEY";
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  async function cargarDatos() {
+    const { data: materias, error: errMp } = await db
+      .from("materias_primas")
+      .select("*")
+      .order("id", { ascending: true });
+
+    const { data: productos, error: errProd } = await db
+      .from("productos")
+      .select("*, receta_ingredientes(*)")
+      .order("id", { ascending: true });
+
+    if (errMp || errProd) {
+      console.error("Error cargando desde Supabase:", errMp || errProd);
+      return;
+    }
+
+    console.log("Materias primas:", materias);
+    console.log("Productos y recetas:", productos);
+  }
+
+  cargarDatos();
+
   </script>
   <style>
     /* Patrón sutil decorativo de pastelería en tonos lavanda sobre fondo crema */
@@ -1273,6 +1305,7 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
     window.addEventListener('DOMContentLoaded', () => {
       loadFromDatabase();
     });
+    
   </script>
 </body>
 </html>
