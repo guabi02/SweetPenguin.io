@@ -372,12 +372,12 @@
       const { data: materias_primas, error: errMp } = await db
         .from("materias_primas")
         .select("*")
-        .order("id", { ascending: true });
+        .order("nombre", { ascending: true });
 
       const { data: productos, error: errProd } = await db
         .from("productos")
         .select("*, receta_ingredientes(*)")
-        .order("id", { ascending: true });
+        .order("nombre", { ascending: true });
 
       if (errMp || errProd) {
         console.error("Error cargando desde Supabase:", errMp || errProd);
