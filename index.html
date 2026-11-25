@@ -290,6 +290,9 @@
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
+            <button onclick="confirmRestoreDefault()" class="sm:hidden inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold bg-lavender-200 text-plum-900 border border-lavender-300">
+              Restaurar Excel
+            </button>
             <button onclick="openNewIngredientModal()" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-semibold bg-plum-600 hover:bg-plum-800 text-vanilla-50 shadow-plum-md transition cursor-pointer">
               <svg class="w-5 h-5 text-lavender-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
               Agregar Ingrediente
@@ -343,7 +346,7 @@
   <footer class="bg-vanilla-50/90 border-t border-lavender-300 py-5 mt-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-mutedplum-600">
       <p><strong class="text-plum-900">Sweet Pengüin</strong> • Sistema de Gestión de Costos y Recetas de Pastelería</p>
-      <p>Conectado a base de datos vía <code class="font-mono text-plum-700">DB_CONFIG</code>.</p>
+      <p>Los datos se guardan automáticamente en tu navegador y pueden exportarse a CSV, JSON o SQL.</p>
     </div>
   </footer>
 
@@ -523,7 +526,7 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
 
 
   <!-- ======================================================================= -->
-  <!-- MODAL 4: CONFIRMACIÓN PERSONALIZADA                                      -->
+  <!-- MODAL 4: CONFIRMACIÓN PERSONALIZADA (SIN ALERT/CONFIRM NATIVO)          -->
   <!-- ======================================================================= -->
   <div id="modal-confirm" class="hidden fixed inset-0 z-50 bg-plum-950/55 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-vanilla-50 rounded-3xl border border-lavender-300 shadow-plum-lg max-w-sm w-full p-6 space-y-4">
@@ -539,59 +542,311 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
 
   <script>
     // =========================================================================
-    // 1. CONFIGURACIÓN DE CONEXIÓN A TU BASE DE DATOS / API
+    // 1. DATOS INICIALES EXTRAÍDOS DEL EXCEL "SweetPengüin(2).xlsx"
     // =========================================================================
-    const DB_CONFIG = {
-      endpoints: {
-        ingredientes: '/api/ingredientes',
-        productos: '/api/productos',
-        recetaItems: '/api/receta-ingredientes'
+    const DEFAULT_INGREDIENTS = [
+      { id: 'ing_manteca', name: 'Manteca', buyQty: 5, buyPrice: 85000, unit: 'kg' },
+      { id: 'ing_azucar', name: 'Azúcar', buyQty: 1, buyPrice: 2000, unit: 'kg' },
+      { id: 'ing_harina', name: 'Harina', buyQty: 1, buyPrice: 2000, unit: 'kg' },
+      { id: 'ing_huevos', name: 'Huevos', buyQty: 30, buyPrice: 7800, unit: 'unid' },
+      { id: 'ing_leche', name: 'Leche', buyQty: 1, buyPrice: 2300, unit: 'lt' },
+      { id: 'ing_choc_amargo', name: 'Chocolate amargo / Cacao', buyQty: 1, buyPrice: 18500, unit: 'kg' },
+      { id: 'ing_azucar_imp', name: 'Azúcar impalpable', buyQty: 1, buyPrice: 3200, unit: 'kg' },
+      { id: 'ing_maicena', name: 'Fécula de maíz / Maicena', buyQty: 1, buyPrice: 3200, unit: 'kg' },
+      { id: 'ing_chips', name: 'Chips de chocolate', buyQty: 1, buyPrice: 18200, unit: 'kg' },
+      { id: 'ing_azucar_negra', name: 'Azúcar negra', buyQty: 1, buyPrice: 3100, unit: 'kg' },
+      { id: 'ing_limon', name: 'Limón', buyQty: 1, buyPrice: 3000, unit: 'kg' },
+      { id: 'ing_coco', name: 'Coco rallado', buyQty: 1, buyPrice: 14600, unit: 'kg' },
+      { id: 'ing_ddl', name: 'Dulce de leche', buyQty: 1, buyPrice: 6500, unit: 'kg' },
+      { id: 'ing_choc_cob', name: 'Chocolate cobertura', buyQty: 1, buyPrice: 16875, unit: 'kg' },
+      { id: 'ing_crema', name: 'Crema de leche', buyQty: 1, buyPrice: 13500, unit: 'lt' },
+      { id: 'ing_caja', name: 'Caja', buyQty: 1, buyPrice: 2000, unit: 'unid' },
+      { id: 'ing_base_carton', name: 'Base de cartón', buyQty: 1, buyPrice: 500, unit: 'unid' },
+      { id: 'ing_yogurt', name: 'Yogurt natural', buyQty: 1, buyPrice: 18000, unit: 'kg' },
+      { id: 'ing_aceite', name: 'Aceite', buyQty: 1, buyPrice: 4300, unit: 'lt' },
+      { id: 'ing_caja_donas', name: 'Caja Mini Donas', buyQty: 1, buyPrice: 700, unit: 'unid' },
+      { id: 'ing_naranja', name: 'Naranja', buyQty: 1, buyPrice: 500, unit: 'unid' },
+      { id: 'ing_mix_donas', name: 'Limón / Harina / Chips mix', buyQty: 1, buyPrice: 1000, unit: 'unid' },
+      { id: 'ing_crema_doble', name: 'Crema doble', buyQty: 0.35, buyPrice: 4640, unit: 'kg' },
+      { id: 'ing_bananas', name: 'Bananas', buyQty: 1, buyPrice: 300, unit: 'unid' }
+    ];
+
+    const DEFAULT_PRODUCTS = [
+      {
+        id: 'prod_cookie_doble',
+        name: 'Cookie Doble Chocolate',
+        category: 'Cookies y Alfajores',
+        yield: 16,
+        marginPercent: 83,
+        ingredients: [
+          { ingredientId: 'ing_manteca', qty: 0.14 },
+          { ingredientId: 'ing_azucar', qty: 0.07 },
+          { ingredientId: 'ing_huevos', qty: 1 },
+          { ingredientId: 'ing_harina', qty: 0.16 },
+          { ingredientId: 'ing_chips', qty: 0.25 },
+          { ingredientId: 'ing_azucar_negra', qty: 0.13 },
+          { ingredientId: 'ing_choc_amargo', qty: 0.07 }
+        ]
       },
-      headers: {
-        'Content-Type': 'application/json'
+      {
+        id: 'prod_cookie_clasica',
+        name: 'Cookie Clásica',
+        category: 'Cookies y Alfajores',
+        yield: 15,
+        marginPercent: 150,
+        ingredients: [
+          { ingredientId: 'ing_manteca', qty: 0.14 },
+          { ingredientId: 'ing_azucar', qty: 0.20 },
+          { ingredientId: 'ing_huevos', qty: 1 },
+          { ingredientId: 'ing_harina', qty: 0.23 },
+          { ingredientId: 'ing_chips', qty: 0.25 }
+        ]
+      },
+      {
+        id: 'prod_alfajor_maicena',
+        name: 'Alfajor de Maicena',
+        category: 'Cookies y Alfajores',
+        yield: 15,
+        marginPercent: 150,
+        ingredients: [
+          { ingredientId: 'ing_manteca', qty: 0.10 },
+          { ingredientId: 'ing_huevos', qty: 6 },
+          { ingredientId: 'ing_maicena', qty: 0.20 },
+          { ingredientId: 'ing_harina', qty: 0.14 },
+          { ingredientId: 'ing_azucar', qty: 0.15 },
+          { ingredientId: 'ing_ddl', qty: 0.50 }
+        ]
+      },
+      {
+        id: 'prod_masa_tarta',
+        name: 'Masa Tarta 26cm (Base)',
+        category: 'Bases y Cremas',
+        yield: 1,
+        marginPercent: 100,
+        ingredients: [
+          { ingredientId: 'ing_manteca', qty: 0.10 },
+          { ingredientId: 'ing_azucar', qty: 0.155 },
+          { ingredientId: 'ing_huevos', qty: 1 },
+          { ingredientId: 'ing_harina', qty: 0.30 }
+        ]
+      },
+      {
+        id: 'prod_danesas',
+        name: 'Danesas',
+        category: 'Cookies y Alfajores',
+        yield: 33,
+        marginPercent: 100,
+        ingredients: [
+          { ingredientId: 'ing_manteca', qty: 0.18 },
+          { ingredientId: 'ing_azucar', qty: 0.10 },
+          { ingredientId: 'ing_huevos', qty: 3 },
+          { ingredientId: 'ing_harina', qty: 0.25 }
+        ]
+      },
+      {
+        id: 'prod_mini_donas',
+        name: 'Mini Donas (1 Caja)',
+        category: 'Cookies y Alfajores',
+        yield: 1,
+        marginPercent: 100,
+        ingredients: [
+          { ingredientId: 'ing_harina', qty: 0.35 },
+          { ingredientId: 'ing_azucar', qty: 0.15 },
+          { ingredientId: 'ing_leche', qty: 0.16 },
+          { ingredientId: 'ing_huevos', qty: 2 },
+          { ingredientId: 'ing_aceite', qty: 0.08 },
+          { ingredientId: 'ing_choc_cob', qty: 0.20 },
+          { ingredientId: 'ing_caja_donas', qty: 1, note: 'Packaging' }
+        ]
+      },
+      {
+        id: 'prod_budin_choc',
+        name: 'Budín Chocolate',
+        category: 'Budines y Bizcochuelos',
+        yield: 3,
+        marginPercent: 163,
+        ingredients: [
+          { ingredientId: 'ing_manteca', qty: 0.17 },
+          { ingredientId: 'ing_azucar', qty: 0.26 },
+          { ingredientId: 'ing_huevos', qty: 3 },
+          { ingredientId: 'ing_harina', qty: 0.28 },
+          { ingredientId: 'ing_leche', qty: 0.19 },
+          { ingredientId: 'ing_choc_amargo', qty: 0.07 }
+        ]
+      },
+      {
+        id: 'prod_budin_vainilla',
+        name: 'Budín Vainilla / Limón',
+        category: 'Budines y Bizcochuelos',
+        yield: 3,
+        marginPercent: 150,
+        ingredients: [
+          { ingredientId: 'ing_manteca', qty: 0.17 },
+          { ingredientId: 'ing_azucar', qty: 0.26 },
+          { ingredientId: 'ing_huevos', qty: 3 },
+          { ingredientId: 'ing_harina', qty: 0.35 },
+          { ingredientId: 'ing_leche', qty: 0.19 }
+        ]
+      },
+      {
+        id: 'prod_budin_yogur',
+        name: 'Budín de Yogur',
+        category: 'Budines y Bizcochuelos',
+        yield: 3,
+        marginPercent: 100,
+        ingredients: [
+          { ingredientId: 'ing_yogurt', qty: 0.10 },
+          { ingredientId: 'ing_azucar', qty: 0.15 },
+          { ingredientId: 'ing_huevos', qty: 2 },
+          { ingredientId: 'ing_harina', qty: 0.22 },
+          { ingredientId: 'ing_chips', qty: 0.055 },
+          { ingredientId: 'ing_aceite', qty: 0.08 }
+        ]
+      },
+      {
+        id: 'prod_bizcochuelo_naranja',
+        name: 'Bizcochuelo de Naranja',
+        category: 'Budines y Bizcochuelos',
+        yield: 1,
+        marginPercent: 53,
+        ingredients: [
+          { ingredientId: 'ing_harina', qty: 0.50 },
+          { ingredientId: 'ing_huevos', qty: 4 },
+          { ingredientId: 'ing_manteca', qty: 0.10 },
+          { ingredientId: 'ing_azucar', qty: 0.25 },
+          { ingredientId: 'ing_naranja', qty: 2 }
+        ]
+      },
+      {
+        id: 'prod_buttercream',
+        name: 'Buttercream (Base)',
+        category: 'Bases y Cremas',
+        yield: 1,
+        marginPercent: 100,
+        ingredients: [
+          { ingredientId: 'ing_huevos', qty: 6 },
+          { ingredientId: 'ing_azucar', qty: 0.40 },
+          { ingredientId: 'ing_manteca', qty: 0.55 }
+        ]
+      },
+      {
+        id: 'prod_lemon_pie',
+        name: 'Lemon Pie Completo (Masa 26cm + Packaging)',
+        category: 'Tortas',
+        yield: 1,
+        marginPercent: 290,
+        ingredients: [
+          { ingredientId: 'ing_manteca', qty: 0.10, note: 'Masa 26cm' },
+          { ingredientId: 'ing_azucar', qty: 0.155, note: 'Masa 26cm' },
+          { ingredientId: 'ing_huevos', qty: 1, note: 'Masa 26cm' },
+          { ingredientId: 'ing_harina', qty: 0.30, note: 'Masa 26cm' },
+          { ingredientId: 'ing_huevos', qty: 8, note: 'Relleno (4 yemas + 4 claras)' },
+          { ingredientId: 'ing_leche', qty: 0.50, note: 'Relleno' },
+          { ingredientId: 'ing_azucar', qty: 0.70, note: 'Relleno (0.20 + 0.50)' },
+          { ingredientId: 'ing_maicena', qty: 0.06, note: 'Relleno' },
+          { ingredientId: 'ing_manteca', qty: 0.05, note: 'Relleno' },
+          { ingredientId: 'ing_limon', qty: 1, note: 'Relleno' },
+          { ingredientId: 'ing_caja', qty: 1, note: 'Packaging' },
+          { ingredientId: 'ing_base_carton', qty: 1, note: 'Packaging' }
+        ]
+      },
+      {
+        id: 'prod_tarta_coco',
+        name: 'Tarta de Coco Completa (Masa 26cm + Packaging)',
+        category: 'Tortas',
+        yield: 1,
+        marginPercent: 150,
+        ingredients: [
+          { ingredientId: 'ing_manteca', qty: 0.10, note: 'Masa 26cm' },
+          { ingredientId: 'ing_azucar', qty: 0.155, note: 'Masa 26cm' },
+          { ingredientId: 'ing_huevos', qty: 1, note: 'Masa 26cm' },
+          { ingredientId: 'ing_harina', qty: 0.30, note: 'Masa 26cm' },
+          { ingredientId: 'ing_huevos', qty: 2, note: 'Relleno' },
+          { ingredientId: 'ing_azucar', qty: 0.10, note: 'Relleno' },
+          { ingredientId: 'ing_crema', qty: 0.10, note: 'Relleno' },
+          { ingredientId: 'ing_coco', qty: 0.20, note: 'Relleno' },
+          { ingredientId: 'ing_ddl', qty: 0.40, note: 'Relleno' },
+          { ingredientId: 'ing_caja', qty: 1, note: 'Packaging' },
+          { ingredientId: 'ing_base_carton', qty: 1, note: 'Packaging' }
+        ]
+      },
+      {
+        id: 'prod_tarta_bombon',
+        name: 'Tarta Bombón Completa (Masa 26cm + Packaging)',
+        category: 'Tortas',
+        yield: 1,
+        marginPercent: 150,
+        ingredients: [
+          { ingredientId: 'ing_manteca', qty: 0.10, note: 'Masa 26cm' },
+          { ingredientId: 'ing_azucar', qty: 0.155, note: 'Masa 26cm' },
+          { ingredientId: 'ing_huevos', qty: 1, note: 'Masa 26cm' },
+          { ingredientId: 'ing_harina', qty: 0.30, note: 'Masa 26cm' },
+          { ingredientId: 'ing_crema', qty: 0.10, note: 'Relleno' },
+          { ingredientId: 'ing_choc_cob', qty: 0.30, note: 'Relleno' },
+          { ingredientId: 'ing_ddl', qty: 0.60, note: 'Relleno' },
+          { ingredientId: 'ing_caja', qty: 1, note: 'Packaging' },
+          { ingredientId: 'ing_base_carton', qty: 1, note: 'Packaging' }
+        ]
+      },
+      {
+        id: 'prod_tarta_banana',
+        name: 'Tarta Banana Split Completa (Masa 26cm + Packaging)',
+        category: 'Tortas',
+        yield: 1,
+        marginPercent: 150,
+        ingredients: [
+          { ingredientId: 'ing_manteca', qty: 0.10, note: 'Masa 26cm' },
+          { ingredientId: 'ing_azucar', qty: 0.155, note: 'Masa 26cm' },
+          { ingredientId: 'ing_huevos', qty: 1, note: 'Masa 26cm' },
+          { ingredientId: 'ing_harina', qty: 0.30, note: 'Masa 26cm' },
+          { ingredientId: 'ing_crema_doble', qty: 0.35, note: 'Relleno' },
+          { ingredientId: 'ing_ddl', qty: 0.50, note: 'Relleno' },
+          { ingredientId: 'ing_azucar_imp', qty: 0.035, note: 'Relleno' },
+          { ingredientId: 'ing_bananas', qty: 3, note: 'Relleno' },
+          { ingredientId: 'ing_caja', qty: 1, note: 'Packaging' },
+          { ingredientId: 'ing_base_carton', qty: 1, note: 'Packaging' }
+        ]
       }
-    };
+    ];
+
+    // =========================================================================
+    // 2. ESTADO DE LA APLICACIÓN Y PERSISTENCIA (SIMULACIÓN DB EN LOCALSTORAGE)
+    // =========================================================================
+    const STORAGE_KEY_ING = 'sweet_penguin_ingredients_v2';
+    const STORAGE_KEY_PROD = 'sweet_penguin_products_v2';
 
     let ingredients = [];
     let products = [];
     let allCollapsed = false;
 
-    async function loadFromDatabase() {
+    function loadDatabase() {
       try {
-        const [resIng, resProd] = await Promise.all([
-          fetch(DB_CONFIG.endpoints.ingredientes, { headers: DB_CONFIG.headers }),
-          fetch(DB_CONFIG.endpoints.productos, { headers: DB_CONFIG.headers })
-        ]);
-
-        if (resIng.ok) {
-          ingredients = await resIng.json();
-        }
-        if (resProd.ok) {
-          products = await resProd.json();
-        }
-      } catch (err) {
-        console.warn('Configura DB_CONFIG.endpoints para consultar tu base de datos:', err);
+        const savedIng = localStorage.getItem(STORAGE_KEY_ING);
+        const savedProd = localStorage.getItem(STORAGE_KEY_PROD);
+        ingredients = savedIng ? JSON.parse(savedIng) : JSON.parse(JSON.stringify(DEFAULT_INGREDIENTS));
+        products = savedProd ? JSON.parse(savedProd) : JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+      } catch (e) {
+        console.error('Error leyendo LocalStorage:', e);
+        ingredients = JSON.parse(JSON.stringify(DEFAULT_INGREDIENTS));
+        products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
       }
-
-      updateNavBadges();
-      renderProductos();
-      renderIngredientes();
     }
 
-    function exportDataJson() {
-      const payload = JSON.stringify({ ingredients, products }, null, 2);
-      const blob = new Blob([payload], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'sweet_penguin_datos.json';
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('Datos exportados correctamente');
+    function saveDatabase(silent = false) {
+      try {
+        localStorage.setItem(STORAGE_KEY_ING, JSON.stringify(ingredients));
+        localStorage.setItem(STORAGE_KEY_PROD, JSON.stringify(products));
+        updateNavBadges();
+        if (!silent) {
+          showToast('Cambios guardados en base de datos');
+        }
+      } catch (e) {
+        showToast('Error al guardar cambios', 'error');
+      }
     }
 
     // =========================================================================
-    // 2. UTILIDADES DE FORMATO Y CÁLCULOS FINANCIEROS
+    // 3. UTILIDADES DE FORMATO Y CÁLCULOS FINANCIEROS
     // =========================================================================
     const currencyFormatter = new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -615,7 +870,7 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
     }
 
     function getIngredientById(id) {
-      return ingredients.find(i => String(i.id) === String(id));
+      return ingredients.find(i => i.id === id);
     }
 
     function getUnitPrice(ing) {
@@ -625,17 +880,16 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
 
     function calculateProductMetrics(product) {
       let totalCost = 0;
-      const lines = (product.ingredients || []).map((item, idx) => {
+      const lines = product.ingredients.map((item, idx) => {
         const ing = getIngredientById(item.ingredientId);
         const unitPrice = ing ? getUnitPrice(ing) : 0;
         const subtotal = unitPrice * (Number(item.qty) || 0);
         totalCost += subtotal;
         return {
           index: idx,
-          id: item.id ?? null,
           ingredientId: item.ingredientId,
-          name: ing ? ing.name : (item.name || 'Ingrediente'),
-          unit: ing ? ing.unit : (item.unit || 'unid'),
+          name: ing ? ing.name : 'Ingrediente eliminado',
+          unit: ing ? ing.unit : 'unid',
           qty: Number(item.qty) || 0,
           note: item.note || '',
           unitPrice,
@@ -663,12 +917,8 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
     }
 
     // =========================================================================
-    // 3. NAVEGACIÓN ENTRE PÁGINAS Y UI HELPERS
+    // 4. NAVEGACIÓN ENTRE PÁGINAS Y UI HELPERS
     // =========================================================================
-    const baseTabClass = 'w-44 sm:w-48 h-12 px-4 rounded-[22px] flex items-center justify-between gap-2 text-xs font-bold leading-tight transition-all duration-200 cursor-pointer';
-    const activeTabClass = `${baseTabClass} bg-plum-600 text-vanilla-50 shadow-plum-sm`;
-    const inactiveTabClass = `${baseTabClass} text-plum-950 hover:bg-lavender-200/70`;
-
     function switchView(viewName) {
       const viewProd = document.getElementById('view-productos');
       const viewIng = document.getElementById('view-ingredientes');
@@ -734,11 +984,26 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
       openModal('modal-confirm');
     }
 
+    function confirmRestoreDefault() {
+      customConfirm(
+        'Restaurar datos originales del Excel',
+        'Se perderán los cambios manuales y se volverán a cargar los 24 ingredientes y 15 productos originales de Sweet Pengüin.',
+        () => {
+          ingredients = JSON.parse(JSON.stringify(DEFAULT_INGREDIENTS));
+          products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+          saveDatabase(true);
+          renderIngredientes();
+          renderProductos();
+          showToast('Datos originales del Excel restaurados');
+        }
+      );
+    }
+
     // =========================================================================
-    // 4. PÁGINA 1: RENDERIZADO Y LÓGICA DE MATERIA PRIMA
+    // 5. PÁGINA 1: RENDERIZADO Y LÓGICA DE MATERIA PRIMA
     // =========================================================================
     function countIngredientUsage(ingId) {
-      return products.filter(p => (p.ingredients || []).some(item => String(item.ingredientId) === String(ingId))).length;
+      return products.filter(p => p.ingredients.some(item => item.ingredientId === ingId)).length;
     }
 
     function renderIngredientes() {
@@ -747,7 +1012,7 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
       const unitFilter = document.getElementById('filter-unidad').value;
 
       const filtered = ingredients.filter(ing => {
-        const matchesSearch = String(ing.name || '').toLowerCase().includes(search);
+        const matchesSearch = ing.name.toLowerCase().includes(search);
         const matchesUnit = unitFilter === 'all' || ing.unit === unitFilter;
         return matchesSearch && matchesUnit;
       });
@@ -756,7 +1021,7 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
         tbody.innerHTML = `
           <tr>
             <td colspan="7" class="py-12 text-center text-mutedplum-600">
-              No hay ingredientes cargados o no coinciden con el filtro.
+              No se encontraron ingredientes con ese filtro.
             </td>
           </tr>
         `;
@@ -773,7 +1038,7 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
             <td class="py-3.5 px-5 font-semibold text-plum-950">
               <input 
                 type="text" 
-                value="${String(ing.name || '').replace(/"/g, '&quot;')}" 
+                value="${ing.name.replace(/"/g, '&quot;')}" 
                 onchange="updateIngredientField('${ing.id}', 'name', this.value)"
                 class="w-full bg-transparent border border-transparent hover:border-lavender-300 focus:border-plum-500 focus:bg-white rounded-lg px-2 py-1 font-semibold text-plum-950 focus:outline-none transition"
               />
@@ -834,7 +1099,7 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
       }).join('');
     }
 
-    async function updateIngredientField(id, field, rawValue) {
+    function updateIngredientField(id, field, rawValue) {
       const ing = getIngredientById(id);
       if (!ing) return;
 
@@ -862,20 +1127,13 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
         ing.buyPrice = num;
       }
 
-      try {
-        await fetch(`${DB_CONFIG.endpoints.ingredientes}/${id}`, {
-          method: 'PUT',
-          headers: DB_CONFIG.headers,
-          body: JSON.stringify(ing)
-        });
-      } catch (_) {}
-
+      saveDatabase(true);
       renderIngredientes();
       renderProductos();
       showToast(`"${ing.name}" actualizado (${formatMoney(getUnitPrice(ing))}/${ing.unit})`);
     }
 
-    async function deleteIngredient(id) {
+    function deleteIngredient(id) {
       const ing = getIngredientById(id);
       if (!ing) return;
       const usageCount = countIngredientUsage(id);
@@ -888,17 +1146,10 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
       customConfirm(
         'Eliminar ingrediente',
         `¿Seguro que deseas eliminar "${ing.name}" de la base de datos?`,
-        async () => {
-          ingredients = ingredients.filter(i => String(i.id) !== String(id));
-          try {
-            await fetch(`${DB_CONFIG.endpoints.ingredientes}/${id}`, {
-              method: 'DELETE',
-              headers: DB_CONFIG.headers
-            });
-          } catch (_) {}
-          updateNavBadges();
+        () => {
+          ingredients = ingredients.filter(i => i.id !== id);
+          saveDatabase();
           renderIngredientes();
-          showToast(`"${ing.name}" eliminado`);
         }
       );
     }
@@ -911,7 +1162,7 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
       openModal('modal-new-ingredient');
     }
 
-    async function handleAddIngredient(e) {
+    function handleAddIngredient(e) {
       e.preventDefault();
       const name = document.getElementById('new-ing-name').value.trim();
       const buyQty = parseFloat(document.getElementById('new-ing-qty').value);
@@ -923,7 +1174,7 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
         return;
       }
 
-      const payload = {
+      const newIng = {
         id: 'ing_' + Date.now(),
         name,
         buyQty,
@@ -931,26 +1182,15 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
         unit
       };
 
-      try {
-        const res = await fetch(DB_CONFIG.endpoints.ingredientes, {
-          method: 'POST',
-          headers: DB_CONFIG.headers,
-          body: JSON.stringify(payload)
-        });
-        const created = res.ok ? await res.json() : payload;
-        ingredients.unshift(created);
-      } catch (_) {
-        ingredients.unshift(payload);
-      }
-
-      updateNavBadges();
+      ingredients.unshift(newIng);
+      saveDatabase();
       closeModal('modal-new-ingredient');
       renderIngredientes();
       showToast(`Ingrediente "${name}" agregado`);
     }
 
     // =========================================================================
-    // 5. PÁGINA 2: RENDERIZADO Y LÓGICA DE PRODUCTOS Y RECETAS
+    // 6. PÁGINA 2: RENDERIZADO Y LÓGICA DE PRODUCTOS Y RECETAS
     // =========================================================================
     function renderProductos() {
       const grid = document.getElementById('productos-grid');
@@ -958,13 +1198,14 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
       const search = (document.getElementById('search-productos').value || '').toLowerCase().trim();
       const categoryFilter = document.getElementById('filter-category').value;
 
+      // Calcular KPIs globales
       let avgMargin = 0;
       let highestProfitProduct = { name: '-', profit: 0 };
       products.forEach(p => {
         const m = calculateProductMetrics(p);
         avgMargin += m.marginPercent;
         if (m.profitAmount > highestProfitProduct.profit) {
-          highestProfitProduct = { name: String(p.name || '').split('(')[0].trim(), profit: m.profitAmount };
+          highestProfitProduct = { name: p.name.split('(')[0].trim(), profit: m.profitAmount };
         }
       });
       avgMargin = products.length ? Math.round(avgMargin / products.length) : 0;
@@ -988,12 +1229,13 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
         </div>
       `;
 
+      // Filtrar productos
       const filtered = products.filter(prod => {
         const matchesCat = categoryFilter === 'all' || prod.category === categoryFilter;
-        const inName = String(prod.name || '').toLowerCase().includes(search);
-        const inIngredients = (prod.ingredients || []).some(item => {
+        const inName = prod.name.toLowerCase().includes(search);
+        const inIngredients = prod.ingredients.some(item => {
           const ing = getIngredientById(item.ingredientId);
-          return ing && String(ing.name || '').toLowerCase().includes(search);
+          return ing && ing.name.toLowerCase().includes(search);
         });
         return matchesCat && (inName || inIngredients);
       });
@@ -1001,8 +1243,8 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
       if (filtered.length === 0) {
         grid.innerHTML = `
           <div class="col-span-full bg-vanilla-50 rounded-3xl p-12 text-center border border-lavender-300 shadow-plum-sm">
-            <p class="text-lg font-serif font-semibold text-plum-900">No hay productos para mostrar</p>
-            <p class="text-sm text-mutedplum-600 mt-1">Conecta tu base de datos, ajusta los filtros o crea una nueva receta.</p>
+            <p class="text-lg font-serif font-semibold text-plum-900">No se encontraron productos</p>
+            <p class="text-sm text-mutedplum-600 mt-1">Prueba con otro término de búsqueda o crea una nueva receta.</p>
           </div>
         `;
         return;
@@ -1115,10 +1357,11 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
               </div>
             </div>
 
-            <!-- Pie Financiero de la Tarjeta -->
+            <!-- Pie Financiero de la Tarjeta (Una sola fila horizontal proporcionada) -->
             <div class="px-4 py-3 bg-lavender-100/80 border-t border-lavender-300">
               <div class="bg-plum-900 text-vanilla-50 rounded-2xl px-3 py-2.5 shadow-plum-sm flex items-center justify-between gap-2 overflow-x-auto whitespace-nowrap">
                 
+                <!-- Costo de producción -->
                 <div class="flex items-center gap-1 shrink-0">
                   <span class="text-[10px] uppercase tracking-wide text-lavender-300 font-semibold">Costo:</span>
                   <span class="text-xs font-bold text-vanilla-50">${formatMoney(metrics.totalCost)}</span>
@@ -1126,6 +1369,7 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
 
                 <span class="text-lavender-400/40 select-none shrink-0">|</span>
 
+                <!-- Ganancia (+% y monto) -->
                 <div class="flex items-center gap-1 shrink-0">
                   <span class="text-[10px] uppercase tracking-wide text-lavender-300 font-semibold">Gan. (+${metrics.marginPercent}%):</span>
                   <span class="text-xs font-bold text-lavender-200">+${formatMoney(metrics.profitAmount)}</span>
@@ -1133,6 +1377,7 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
 
                 <span class="text-lavender-400/40 select-none shrink-0">|</span>
 
+                <!-- Precio de Venta Final -->
                 <div class="flex items-center gap-1 shrink-0">
                   <span class="text-[10px] uppercase tracking-wide text-lavender-200 font-bold">Final:</span>
                   <span class="text-xs sm:text-sm font-extrabold text-vanilla-50">${formatMoney(metrics.finalPrice)}</span>
@@ -1140,6 +1385,7 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
 
                 ${metrics.yieldUnits > 1 ? `
                   <span class="text-lavender-400/40 select-none shrink-0">|</span>
+                  <!-- Precio por Unidad -->
                   <div class="flex items-center gap-1 bg-plum-800 border border-lavender-400/35 px-2 py-1 rounded-xl shrink-0">
                     <span class="text-[10px] uppercase tracking-wide text-lavender-200 font-semibold">x Unid (${metrics.yieldUnits}u):</span>
                     <span class="text-xs font-extrabold text-vanilla-50">${formatMoney(metrics.unitSuggestedPrice)}</span>
@@ -1159,8 +1405,8 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
       renderProductos();
     }
 
-    async function updateProductMeta(prodId, field, rawValue) {
-      const prod = products.find(p => String(p.id) === String(prodId));
+    function updateProductMeta(prodId, field, rawValue) {
+      const prod = products.find(p => p.id === prodId);
       if (!prod) return;
       const num = parseFloat(rawValue);
       if (isNaN(num) || num < 0) return;
@@ -1171,57 +1417,31 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
         prod.marginPercent = num;
       }
 
-      try {
-        await fetch(`${DB_CONFIG.endpoints.productos}/${prodId}`, {
-          method: 'PATCH',
-          headers: DB_CONFIG.headers,
-          body: JSON.stringify({ yield: prod.yield, marginPercent: prod.marginPercent })
-        });
-      } catch (_) {}
-
+      saveDatabase();
       renderProductos();
-      showToast('Producto actualizado');
     }
 
-    async function updateRecipeIngredientQty(prodId, lineIndex, rawValue) {
-      const prod = products.find(p => String(p.id) === String(prodId));
+    function updateRecipeIngredientQty(prodId, lineIndex, rawValue) {
+      const prod = products.find(p => p.id === prodId);
       if (!prod || !prod.ingredients[lineIndex]) return;
       const num = parseFloat(rawValue);
       if (isNaN(num) || num < 0) return;
 
-      const item = prod.ingredients[lineIndex];
-      item.qty = num;
-
-      try {
-        await fetch(`${DB_CONFIG.endpoints.recetaItems}/${item.id ?? lineIndex}`, {
-          method: 'PATCH',
-          headers: DB_CONFIG.headers,
-          body: JSON.stringify({ productoId: prodId, ingredientId: item.ingredientId, qty: num })
-        });
-      } catch (_) {}
-
+      prod.ingredients[lineIndex].qty = num;
+      saveDatabase();
       renderProductos();
-      showToast('Cantidad actualizada');
     }
 
-    async function removeIngredientFromProduct(prodId, lineIndex) {
-      const prod = products.find(p => String(p.id) === String(prodId));
+    function removeIngredientFromProduct(prodId, lineIndex) {
+      const prod = products.find(p => p.id === prodId);
       if (!prod) return;
-      const [removed] = prod.ingredients.splice(lineIndex, 1);
-
-      try {
-        await fetch(`${DB_CONFIG.endpoints.recetaItems}/${removed?.id ?? lineIndex}`, {
-          method: 'DELETE',
-          headers: DB_CONFIG.headers
-        });
-      } catch (_) {}
-
+      prod.ingredients.splice(lineIndex, 1);
+      saveDatabase();
       renderProductos();
-      showToast('Ingrediente quitado de la receta');
     }
 
-    async function addIngredientToProduct(prodId) {
-      const prod = products.find(p => String(p.id) === String(prodId));
+    function addIngredientToProduct(prodId) {
+      const prod = products.find(p => p.id === prodId);
       if (!prod) return;
       const selectEl = document.getElementById(`add-ing-select-${prodId}`);
       const qtyEl = document.getElementById(`add-ing-qty-${prodId}`);
@@ -1233,48 +1453,28 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
         return;
       }
 
-      prod.ingredients = prod.ingredients || [];
-      const newItem = { id: 'item_' + Date.now(), ingredientId, qty };
-
-      try {
-        const res = await fetch(DB_CONFIG.endpoints.recetaItems, {
-          method: 'POST',
-          headers: DB_CONFIG.headers,
-          body: JSON.stringify({ productoId: prodId, ...newItem })
-        });
-        prod.ingredients.push(res.ok ? await res.json() : newItem);
-      } catch (_) {
-        prod.ingredients.push(newItem);
-      }
-
+      prod.ingredients.push({ ingredientId, qty });
+      saveDatabase();
       renderProductos();
-      showToast('Ingrediente sumado a la receta');
     }
 
-    async function deleteProduct(prodId) {
-      const prod = products.find(p => String(p.id) === String(prodId));
+    function deleteProduct(prodId) {
+      const prod = products.find(p => p.id === prodId);
       if (!prod) return;
 
       customConfirm(
         'Eliminar producto',
         `¿Estás seguro de eliminar "${prod.name}" de tu catálogo?`,
-        async () => {
-          products = products.filter(p => String(p.id) !== String(prodId));
-          try {
-            await fetch(`${DB_CONFIG.endpoints.productos}/${prodId}`, {
-              method: 'DELETE',
-              headers: DB_CONFIG.headers
-            });
-          } catch (_) {}
-          updateNavBadges();
+        () => {
+          products = products.filter(p => p.id !== prodId);
+          saveDatabase();
           renderProductos();
-          showToast(`"${prod.name}" eliminado`);
         }
       );
     }
 
     // =========================================================================
-    // 6. CREACIÓN DE NUEVO PRODUCTO DESDE MODAL
+    // 7. CREACIÓN DE NUEVO PRODUCTO DESDE MODAL
     // =========================================================================
     function openNewProductModal() {
       document.getElementById('new-prod-name').value = '';
@@ -1282,6 +1482,7 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
       document.getElementById('new-prod-margin').value = '100';
       const list = document.getElementById('new-prod-ingredients-list');
       list.innerHTML = '';
+      addTempRecipeRow();
       addTempRecipeRow();
       openModal('modal-new-product');
     }
@@ -1304,7 +1505,7 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
       list.appendChild(row);
     }
 
-    async function handleAddProduct(e) {
+    function handleAddProduct(e) {
       e.preventDefault();
       const name = document.getElementById('new-prod-name').value.trim();
       const category = document.getElementById('new-prod-cat').value;
@@ -1313,11 +1514,11 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
 
       const rows = document.querySelectorAll('.temp-recipe-row');
       const recipeItems = [];
-      rows.forEach((row, idx) => {
+      rows.forEach(row => {
         const ingredientId = row.querySelector('.temp-ing-id').value;
         const qty = parseFloat(row.querySelector('.temp-ing-qty').value);
         if (ingredientId && !isNaN(qty) && qty > 0) {
-          recipeItems.push({ id: 'item_' + Date.now() + '_' + idx, ingredientId, qty });
+          recipeItems.push({ ingredientId, qty });
         }
       });
 
@@ -1326,7 +1527,7 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
         return;
       }
 
-      const payload = {
+      const newProduct = {
         id: 'prod_' + Date.now(),
         name,
         category,
@@ -1335,25 +1536,15 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
         ingredients: recipeItems
       };
 
-      try {
-        const res = await fetch(DB_CONFIG.endpoints.productos, {
-          method: 'POST',
-          headers: DB_CONFIG.headers,
-          body: JSON.stringify(payload)
-        });
-        products.unshift(res.ok ? await res.json() : payload);
-      } catch (_) {
-        products.unshift(payload);
-      }
-
-      updateNavBadges();
+      products.unshift(newProduct);
+      saveDatabase();
       closeModal('modal-new-product');
       renderProductos();
-      showToast(`Producto "${name}" creado`);
+      showToast(`Producto "${name}" creado correctamente`);
     }
 
     // =========================================================================
-    // 7. MODAL ESQUEMA SQL
+    // 8. EXPORTACIÓN (JSON / CSV) Y ESQUEMA SQL
     // =========================================================================
     function openSqlModal() {
       openModal('modal-sql');
@@ -1374,11 +1565,67 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
       document.body.removeChild(textArea);
     }
 
+    function exportDataJSON() {
+      const payload = {
+        emprendimiento: 'Sweet Pengüin',
+        exportado_en: new Date().toISOString(),
+        ingredientes: ingredients.map(i => ({
+          ...i,
+          precio_unitario: Number(getUnitPrice(i).toFixed(2))
+        })),
+        productos: products.map(p => {
+          const m = calculateProductMetrics(p);
+          return {
+            ...p,
+            costo_total: Number(m.totalCost.toFixed(2)),
+            precio_final: Number(m.finalPrice.toFixed(2)),
+            precio_unitario_sugerido: m.unitSuggestedPrice
+          };
+        })
+      };
+
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `SweetPenguin_Costos_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Archivo JSON descargado');
+    }
+
+    function exportDataCSV() {
+      let csv = '\uFEFF';
+      csv += 'PRODUCTO;CATEGORIA;RINDE_UNID;COSTO_TOTAL;GANANCIA_PCT;GANANCIA_MONTO;PRECIO_FINAL_TOTAL;PRECIO_POR_UNIDAD\n';
+
+      products.forEach(p => {
+        const m = calculateProductMetrics(p);
+        csv += `"${p.name}";"${p.category}";${m.yieldUnits};${m.totalCost.toFixed(2).replace('.', ',')};${m.marginPercent};${m.profitAmount.toFixed(2).replace('.', ',')};${m.finalPrice.toFixed(2).replace('.', ',')};${m.unitSuggestedPrice}\n`;
+      });
+
+      csv += '\nINGREDIENTE;CANTIDAD_COMPRA;UNIDAD;PRECIO_PAQUETE;PRECIO_UNITARIO\n';
+      ingredients.forEach(i => {
+        csv += `"${i.name}";${String(i.buyQty).replace('.', ',')};"${i.unit}";${i.buyPrice};${getUnitPrice(i).toFixed(2).replace('.', ',')}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `SweetPenguin_Planilla_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Archivo CSV listo para Excel descargado');
+    }
+
     // =========================================================================
-    // 8. INICIALIZACIÓN AL CARGAR LA PÁGINA
+    // 9. INICIALIZACIÓN AL CARGAR LA PÁGINA
     // =========================================================================
     window.addEventListener('DOMContentLoaded', () => {
-      loadFromDatabase();
+      loadDatabase();
+      updateNavBadges();
+      renderProductos();
+      renderIngredientes();
     });
   </script>
 </body>
