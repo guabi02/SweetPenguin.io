@@ -396,8 +396,6 @@
         unit: r.unit ?? r.unidad_medida ?? "kg"
       }));
 
-      ingredients.sort((a, b) => a[0].localeCompare(b[0]))
-
       products = (productos || []).map(p => ({
         id: p.id,
         name: p.name ?? p.nombre ?? "",
@@ -411,8 +409,6 @@
           note: item.note ?? item.detalle_uso ?? ""
         }))
       }));
-
-      products.sort((a, b) => a[0].localeCompare(b[0]))
 
       updateNavBadges();
       renderProductos();
