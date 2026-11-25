@@ -108,7 +108,7 @@
               <div class="flex items-center gap-2">
                 <h1 class="font-serif text-xl sm:text-2xl font-bold text-plum-900 tracking-tight">Sweet Penguin</h1>
               </div>
-              <p class="text-xs text-mutedplum-600">Pastelería Artesanal • Costeo y Rentabilidad</p>
+              <p class="text-xs text-mutedplum-600">Delicias dulces artesanales</p>
             </div>
           </div>
 
@@ -127,7 +127,7 @@
         <nav class="flex items-center bg-lavender-100 p-1 rounded-2xl border border-lavender-300 self-stretch md:self-auto">
           <button id="tab-productos" onclick="switchView('productos')" class="flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-plum-600 text-vanilla-50 shadow-plum-sm">
             <span>🧁</span>
-            <span>Productos y Recetas</span>
+            <span>Productos</span>
             <span id="badge-productos-count" class="ml-1 px-2 py-0.5 text-xs rounded-full bg-plum-900 text-vanilla-50">15</span>
           </button>
           <button id="tab-ingredientes" onclick="switchView('ingredientes')" class="flex-1 md:flex-initial flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-plum-900 hover:bg-lavender-200/70">
@@ -156,14 +156,8 @@
       <div class="bg-gradient-to-r from-vanilla-50 via-lavender-100/80 to-vanilla-50 rounded-3xl p-5 sm:p-6 border border-lavender-300 shadow-plum-sm">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-lavender-400/40 text-plum-900 border border-lavender-400/60 mb-2">
-              Página 2 • Catálogo y Rentabilidad
-            </span>
-            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-plum-950">Productos y Recetas</h2>
-            <p class="text-sm text-mutedplum-600 mt-1 max-w-2xl">
-              Ajusta las cantidades por receta, el rinde en unidades o el porcentaje de ganancia. Cualquier cambio en la <strong>Materia Prima</strong> recalcula este catálogo al instante.
-            </p>
-          </div>
+            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-plum-950">Productos</h2>
+            </div>
           <div class="flex flex-wrap items-center gap-3">
             <button onclick="openNewProductModal()" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-semibold bg-plum-600 hover:bg-plum-800 text-vanilla-50 shadow-plum-md transition cursor-pointer">
               <svg class="w-5 h-5 text-lavender-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -172,10 +166,6 @@
           </div>
         </div>
 
-        <!-- Resumen Métricas -->
-        <div id="productos-kpis" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-5 border-t border-lavender-300/80">
-          <!-- Renderizado dinámico -->
-        </div>
       </div>
 
       <!-- Barra de Búsqueda y Filtros de Productos -->
@@ -214,13 +204,9 @@
       <div class="bg-gradient-to-r from-vanilla-50 via-lavender-100/80 to-vanilla-50 rounded-3xl p-5 sm:p-6 border border-lavender-300 shadow-plum-sm">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-lavender-400/40 text-plum-900 border border-lavender-400/60 mb-2">
-              Página 1 • Base de Datos de Insumos
-            </span>
-            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-plum-950">Materia Prima e Insumos</h2>
-            <p class="text-sm text-mutedplum-600 mt-1 max-w-2xl">
-              Edita directamente el <strong>precio del paquete</strong> o la <strong>cantidad de compra</strong>. El sistema calculará el costo por kg, litro o unidad y actualizará automáticamente todas las recetas.
-            </p>
+         
+            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-plum-950">Materia Prima</h2>
+           
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <button onclick="openNewIngredientModal()" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-semibold bg-plum-600 hover:bg-plum-800 text-vanilla-50 shadow-plum-md transition cursor-pointer">
@@ -902,24 +888,6 @@ GROUP BY p.id, p.nombre, p.rinde_unidades, p.porcentaje_ganancia;</pre>
       });
       avgMargin = products.length ? Math.round(avgMargin / products.length) : 0;
 
-      kpiContainer.innerHTML = `
-        <div class="bg-vanilla-50/95 rounded-2xl p-3.5 border border-lavender-300 shadow-plum-sm">
-          <p class="text-[11px] font-semibold uppercase tracking-wider text-mutedplum-600">Total Recetas</p>
-          <p class="text-xl font-bold text-plum-950 mt-0.5">${products.length} productos</p>
-        </div>
-        <div class="bg-vanilla-50/95 rounded-2xl p-3.5 border border-lavender-300 shadow-plum-sm">
-          <p class="text-[11px] font-semibold uppercase tracking-wider text-mutedplum-600">Insumos Activos</p>
-          <p class="text-xl font-bold text-plum-950 mt-0.5">${ingredients.length} materias primas</p>
-        </div>
-        <div class="bg-vanilla-50/95 rounded-2xl p-3.5 border border-lavender-300 shadow-plum-sm">
-          <p class="text-[11px] font-semibold uppercase tracking-wider text-mutedplum-600">Margen Promedio</p>
-          <p class="text-xl font-bold text-plum-600 mt-0.5">+${avgMargin}%</p>
-        </div>
-        <div class="bg-vanilla-50/95 rounded-2xl p-3.5 border border-lavender-300 shadow-plum-sm">
-          <p class="text-[11px] font-semibold uppercase tracking-wider text-mutedplum-600">Mayor Ganancia ($)</p>
-          <p class="text-sm sm:text-base font-bold text-plum-800 mt-1 truncate" title="${highestProfitProduct.name}">${highestProfitProduct.name}</p>
-        </div>
-      `;
 
       const filtered = products.filter(prod => {
         const matchesCat = categoryFilter === 'all' || prod.category === categoryFilter;
