@@ -97,59 +97,16 @@
           <div class="flex items-center gap-3.5">
             <!-- Logo Circular SVG -->
             <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-full shadow-plum-sm bg-vanilla-100 flex items-center justify-center overflow-hidden">
-              <svg viewBox="0 0 200 200" class="w-full h-full" xmlns="http://www.w3.org/2000/svg" aria-label="Logo Sweet Pengüin">
-                <defs>
-                  <path id="topArc" d="M 34,100 A 66,66 0 1,1 166,100" />
-                  <path id="bottomArc" d="M 30,104 A 70,70 0 0,0 170,104" />
-                </defs>
-                <!-- Fondo crema del círculo -->
-                <circle cx="100" cy="100" r="96" fill="#FAF6F0" />
-                <!-- Anillo exterior grueso lavanda/violeta -->
-                <circle cx="100" cy="100" r="92" fill="none" stroke="#8C6BAE" stroke-width="8" />
-                <!-- Anillo interior fino -->
-                <circle cx="100" cy="100" r="83" fill="none" stroke="#8C6BAE" stroke-width="2" />
-
-                <!-- Texto curvo superior "Sweet" -->
-                <text fill="#6E4B8E" font-family="'Playfair Display', Georgia, serif" font-weight="800" font-size="25" letter-spacing="3.5">
-                  <textPath href="#topArc" startOffset="50%" text-anchor="middle">Sweet</textPath>
-                </text>
-
-                <!-- Texto curvo inferior "Penguin" -->
-                <text fill="#6E4B8E" font-family="'Playfair Display', Georgia, serif" font-weight="800" font-size="23" letter-spacing="2.5">
-                  <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">Penguin</textPath>
-                </text>
-
-                <!-- Ilustración del Pingüino con gorro de chef -->
-                <g transform="translate(0, 4)">
-                  <!-- Gorro de chef relleno lavanda pastel -->
-                  <path d="M 80,68 C 72,66 68,57 74,51 C 72,43 81,36 89,40 C 95,33 108,35 111,43 C 119,44 122,54 115,60 L 112,68 Z" fill="#B69ED1" stroke="#6E4B8E" stroke-width="3.2" stroke-linejoin="round" />
-                  <!-- Banda del gorro -->
-                  <path d="M 81,67 L 111,65 L 113,73 L 83,75 Z" fill="#C8B4DC" stroke="#6E4B8E" stroke-width="3" stroke-linejoin="round" />
-                  <line x1="90" y1="67" x2="91" y2="74" stroke="#6E4B8E" stroke-width="2.2" />
-                  <line x1="101" y1="66" x2="102" y2="73" stroke="#6E4B8E" stroke-width="2.2" />
-
-                  <!-- Cuerpo del pingüino de perfil -->
-                  <path d="M 85,75 C 79,84 79,98 81,112 C 81,122 77,131 75,136 C 85,140 105,141 116,135 C 123,128 122,112 117,99 C 115,93 114,88 116,83 C 116,78 112,74 107,73" fill="#FFFDF9" stroke="#6E4B8E" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
-                  <!-- Pico -->
-                  <path d="M 116,78 L 127,76 C 129,76 129,79 127,81 L 117,86 Z" fill="#FFFDF9" stroke="#6E4B8E" stroke-width="3.2" stroke-linejoin="round" />
-                  <!-- Mejilla / Cuello -->
-                  <path d="M 105,93 C 111,93 115,89 116,85" fill="none" stroke="#6E4B8E" stroke-width="2.8" stroke-linecap="round" />
-                  <!-- Aleta -->
-                  <path d="M 96,96 C 95,108 89,119 81,125" fill="none" stroke="#6E4B8E" stroke-width="3.2" stroke-linecap="round" />
-                  <!-- Patitas -->
-                  <path d="M 83,139 C 80,144 87,147 95,145 C 97,144 96,140 93,139" fill="#FFFDF9" stroke="#6E4B8E" stroke-width="3" stroke-linecap="round" />
-                  <path d="M 104,139 C 106,144 115,146 121,143 C 123,141 119,138 114,137" fill="#FFFDF9" stroke="#6E4B8E" stroke-width="3" stroke-linecap="round" />
-                </g>
-              </svg>
+       <img
+  src="SweetLogo.png"
+  alt="Logo Sweet Penguin"
+  style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover;"
+/>   
             </div>
 
             <div>
               <div class="flex items-center gap-2">
-                <h1 class="font-serif text-xl sm:text-2xl font-bold text-plum-900 tracking-tight">Sweet Pengüin</h1>
-                <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-lavender-100 text-plum-700 border border-lavender-300">
-                  <span class="w-1.5 h-1.5 rounded-full bg-plum-600 animate-pulse"></span>
-                  Base de Datos Activa
-                </span>
+                <h1 class="font-serif text-xl sm:text-2xl font-bold text-plum-900 tracking-tight">Sweet Penguin</h1>
               </div>
               <p class="text-xs text-mutedplum-600">Pastelería Artesanal • Costeo y Rentabilidad</p>
             </div>
@@ -180,35 +137,7 @@
           </button>
         </nav>
 
-        <!-- Acciones Globales Desktop -->
-        <div class="hidden md:flex items-center gap-2">
-          <button onclick="openSqlModal()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-lavender-100 hover:bg-lavender-200 text-plum-800 border border-lavender-300 transition">
-            <svg class="w-4 h-4 text-plum-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-            Esquema SQL
-          </button>
-          <div class="relative group">
-            <button class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-lavender-100 hover:bg-lavender-200 text-plum-800 border border-lavender-300 transition">
-              <svg class="w-4 h-4 text-plum-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-              Exportar
-            </button>
-            <div class="hidden group-hover:block absolute right-0 mt-1 w-44 bg-vanilla-50 rounded-2xl shadow-plum-lg border border-lavender-300 py-1.5 z-40">
-              <button onclick="exportDataJSON()" class="w-full text-left px-4 py-2 text-xs font-medium text-plum-900 hover:bg-lavender-100 flex items-center justify-between">
-                <span>Descargar JSON</span>
-                <span class="text-[10px] text-mutedplum-600">.json</span>
-              </button>
-              <button onclick="exportDataCSV()" class="w-full text-left px-4 py-2 text-xs font-medium text-plum-900 hover:bg-lavender-100 flex items-center justify-between">
-                <span>Descargar Excel/CSV</span>
-                <span class="text-[10px] text-mutedplum-600">.csv</span>
-              </button>
-            </div>
-          </div>
-          <button onclick="confirmRestoreDefault()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-lavender-400/35 hover:bg-lavender-400/60 text-plum-900 border border-lavender-400 transition" title="Restaurar valores originales del Excel">
-            <svg class="w-4 h-4 text-plum-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-            Restaurar Excel
-          </button>
-        </div>
-
-      </div>
+     </div>
     </div>
   </header>
 
