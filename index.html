@@ -58,6 +58,7 @@
     const SUPABASE_URL = "https://xsvxndsiyeatunoizvep.supabase.co";
     const SUPABASE_KEY = "sb_publishable_nnEgBCI3BHMjT-8bKrmvyw_DlwwIlI8";
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const IMAGES_BASE_URL = "https://guabi02.github.io/SweetPenguin.io/imagenes/";
   </script>
 
   <style>
@@ -101,7 +102,7 @@
         <div class="flex items-center justify-between shrink-0">
           <div class="flex items-center gap-3.5">
             <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-full shadow-plum-sm bg-vanilla-100 flex items-center justify-center overflow-hidden">
-            <img
+              <img
                 src="https://guabi02.github.io/SweetPenguin.io/imagenes/SweetLogo.png"
                 alt="Logo Sweet Penguin"
                 style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover;"
@@ -323,6 +324,10 @@
               <input type="number" id="new-prod-margin" min="0" step="any" value="100" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
             </div>
           </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-plum-900 mb-1">Archivo de imagen (opcional)</label>
+            <input type="text" id="new-prod-image" placeholder="Ej. pastafrola.jpg" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
+          </div>
         </div>
 
         <div class="bg-lavender-50 p-4 rounded-2xl border border-lavender-300 space-y-3">
@@ -359,6 +364,13 @@
     let ingredients = [];
     let products = [];
     let allCollapsed = false;
+
+    function getProductImageUrl(imageVal) {
+      const clean = String(imageVal || '').trim();
+      if (!clean) return '';
+      if (/^https?:\/\//i.test(clean)) return clean;
+      return `${IMAGES_BASE_URL}${clean.replace(/^\/?imagenes\//i, '')}`;
+    }
 
     function normalizeText(str) {
       return String(str || '')
@@ -447,6 +459,7 @@
 
       products = (productos || []).map(p => {
         const rawCat = p.categoria ?? p["categoría"] ?? "";
+        const rawImage = p.imagen ?? p.imagen_archivo ?? p.image ?? "";
 
         const mpItems = (p.receta_ingredientes || []).map(item => ({
           id: item.id,
@@ -462,6 +475,7 @@
         return {
           id: p.id,
           name: p.nombre ?? "",
+          image: String(rawImage).trim(),
           category: String(rawCat).trim() || "Sin categoría",
           yield: Number(p.rendimiento_unidades ?? 1),
           marginPercent: Number(p.multiplicador_ganancia ?? 0),
@@ -1033,6 +1047,8 @@
       grid.innerHTML = filtered.map(prod => {
         const metrics = calculateProductMetrics(prod);
         const optionsHtml = buildComponentOptionsHtml(prod.id);
+        const imageUrl = getProductImageUrl(prod.image);
+        const safeName = String(prod.name || '').replace(/"/g, '&quot;');
 
         return `
           <article class="bg-vanilla-50 rounded-3xl border border-lavender-300 shadow-plum-md hover:shadow-plum-lg transition-shadow flex flex-col overflow-hidden">
@@ -1044,7 +1060,7 @@
                   </span>
                   <input
                     type="text"
-                    value="${String(prod.name || '').replace(/"/g, '&quot;')}"
+                    value="${safeName}"
                     onchange="updateProductMeta('${prod.id}', 'name', this.value)"
                     onkeydown="if (event.key === 'Enter') { event.preventDefault(); this.blur(); }"
                     title="Editar nombre del producto"
@@ -1052,9 +1068,23 @@
                     class="w-full font-serif text-2xl sm:text-3xl font-bold text-plum-950 leading-snug bg-transparent border border-transparent hover:border-plum-600/30 focus:border-plum-600 focus:bg-vanilla-50/95 rounded-xl px-2 py-0.5 -ml-2 focus:outline-none transition"
                   />
                 </div>
-                <button onclick="deleteProduct('${prod.id}')" title="Eliminar producto" class="p-2 rounded-xl text-plum-800/60 hover:text-rose-700 hover:bg-vanilla-50/80 transition shrink-0">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                </button>
+
+                <div class="flex items-center gap-2 shrink-0">
+                  ${imageUrl ? `
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-vanilla-50/95 border border-lavender-300 shadow-plum-sm shrink-0">
+                      <img
+                        src="${imageUrl.replace(/"/g, '&quot;')}"
+                        alt="${safeName}"
+                        onerror="this.parentElement.classList.add('hidden')"
+                        class="w-full h-full object-cover"
+                      />
+                    </div>
+                  ` : ''}
+
+                  <button onclick="deleteProduct('${prod.id}')" title="Eliminar producto" class="p-2 rounded-xl text-plum-800/60 hover:text-rose-700 hover:bg-vanilla-50/80 transition shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+                </div>
               </div>
 
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 pt-3 border-t border-plum-600/15">
@@ -1406,6 +1436,7 @@
       document.getElementById('new-prod-cat').value = '';
       document.getElementById('new-prod-yield').value = '1';
       document.getElementById('new-prod-margin').value = '100';
+      document.getElementById('new-prod-image').value = '';
       const list = document.getElementById('new-prod-ingredients-list');
       list.innerHTML = '';
       addTempRecipeRow();
@@ -1434,6 +1465,7 @@
       const category = document.getElementById('new-prod-cat').value.trim() || 'Sin categoría';
       const yieldVal = Math.max(1, parseInt(document.getElementById('new-prod-yield').value, 10) || 1);
       const marginPercent = parseFloat(document.getElementById('new-prod-margin').value) || 0;
+      const imageFile = document.getElementById('new-prod-image').value.trim();
 
       const rows = document.querySelectorAll('.temp-recipe-row');
       const mpRecipeItems = [];
@@ -1457,14 +1489,19 @@
         return;
       }
 
+      const insertPayload = {
+        nombre: name,
+        categoria: category,
+        rendimiento_unidades: yieldVal,
+        multiplicador_ganancia: marginPercent
+      };
+      if (imageFile) {
+        insertPayload.imagen = imageFile;
+      }
+
       const { data: createdProd, error: errProd } = await db
         .from('productos')
-        .insert([{
-          nombre: name,
-          categoria: category,
-          rendimiento_unidades: yieldVal,
-          multiplicador_ganancia: marginPercent
-        }])
+        .insert([insertPayload])
         .select()
         .single();
 
@@ -1508,6 +1545,7 @@
       products.push({
         id: createdProd.id,
         name: createdProd.nombre ?? name,
+        image: String(createdProd.imagen ?? createdProd.imagen_archivo ?? imageFile).trim(),
         category: String(createdProd.categoria ?? createdProd["categoría"] ?? category).trim(),
         yield: Number(createdProd.rendimiento_unidades ?? yieldVal),
         marginPercent: Number(createdProd.multiplicador_ganancia ?? marginPercent),
@@ -1543,4 +1581,3 @@
   </script>
 </body>
 </html>
-```[cite: 1]
