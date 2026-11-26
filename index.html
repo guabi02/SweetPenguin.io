@@ -217,7 +217,7 @@
             <option value="all">Todas las unidades</option>
             <option value="kg">Por Kilogramo (kg)</option>
             <option value="lt">Por Litro (lt)</option>
-            <option value="unid">Por Unidad (unid)</option>
+            <option value="ud">Por Unidad (ud)</option>
           </select>
         </div>
       </div>
@@ -275,7 +275,7 @@
             <select id="new-ing-unit" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
               <option value="kg">Kilogramos (kg)</option>
               <option value="lt">Litros (lt)</option>
-              <option value="unid">Unidades (unid)</option>
+              <option value="ud">Unidades (ud)</option>
             </select>
           </div>
         </div>
@@ -315,7 +315,7 @@
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-xs font-semibold text-plum-900 mb-1">Rinde (unid) *</label>
+              <label class="block text-xs font-semibold text-plum-900 mb-1">Rinde (ud) *</label>
               <input type="number" id="new-prod-yield" min="1" step="1" value="1" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
             </div>
             <div>
@@ -368,6 +368,14 @@
         .toLowerCase();
     }
 
+    function normalizeUnit(unitVal) {
+      const clean = normalizeText(unitVal);
+      if (clean === 'unid' || clean === 'unidad' || clean === 'unidades' || clean === 'ud') {
+        return 'ud';
+      }
+      return unitVal || 'kg';
+    }
+
     function isBaseCategory(categoryName) {
       return normalizeText(categoryName).includes('base');
     }
@@ -402,7 +410,7 @@
         name: r.nombre ?? r.name ?? "",
         buyQty: Number(r.cantidad_compra ?? r.buyQty ?? 1),
         buyPrice: Number(r.precio_compra ?? r.precio_paquete ?? r.buyPrice ?? 0),
-        unit: r.unidad_media ?? r.unidad ?? r.unit ?? "kg",
+        unit: normalizeUnit(r.unidad_media ?? r.unidad ?? r.unit ?? "kg"),
         unitPriceRef: r.precio_unitario != null ? Number(r.precio_unitario) : null
       }));
 
@@ -531,7 +539,7 @@
 
     function buildComponentOptionsHtml(excludeProductId = null) {
       const mpOptions = ingredients.map(ing =>
-        `<option value="mp:${ing.id}">${ing.name} (${formatMoney(getUnitPrice(ing))}/${ing.unit})</option>`
+        `<option value="mp:${ing.id}">${ing.name} (${formatMoney(getUnitPrice(ing))}/${normalizeUnit(ing.unit)})</option>`
       ).join('');
 
       const baseProducts = products.filter(p =>
@@ -540,7 +548,7 @@
 
       const baseOptions = baseProducts.map(p => {
         const subMetrics = calculateProductMetrics(p, new Set([String(excludeProductId ?? '')]));
-        return `<option value="base:${p.id}">${p.name} (${formatMoney(subMetrics.unitCost)}/unid)</option>`;
+        return `<option value="base:${p.id}">${p.name} (${formatMoney(subMetrics.unitCost)}/ud)</option>`;
       }).join('');
 
       return `
@@ -578,7 +586,7 @@
             ingredientId: null,
             baseProductId: item.baseProductId,
             name: baseProd ? baseProd.name : 'Producto base',
-            unit: 'unid',
+            unit: 'ud',
             qty,
             unitPrice,
             subtotal
@@ -598,7 +606,7 @@
           ingredientId: item.ingredientId,
           baseProductId: null,
           name: ing ? ing.name : (item.name || 'Ingrediente'),
-          unit: ing ? ing.unit : (item.unit || 'unid'),
+          unit: ing ? normalizeUnit(ing.unit) : normalizeUnit(item.unit || 'ud'),
           qty,
           unitPrice,
           subtotal
@@ -720,8 +728,9 @@
       const unitFilter = document.getElementById('filter-unidad').value;
 
       const filtered = ingredients.filter(ing => {
+        const currentUnit = normalizeUnit(ing.unit);
         const matchesSearch = normalizeText(ing.name).includes(search);
-        const matchesUnit = unitFilter === 'all' || ing.unit === unitFilter;
+        const matchesUnit = unitFilter === 'all' || currentUnit === unitFilter;
         return matchesSearch && matchesUnit;
       });
 
@@ -737,6 +746,7 @@
       }
 
       tbody.innerHTML = filtered.map((ing, idx) => {
+        const currentUnit = normalizeUnit(ing.unit);
         const unitPrice = getUnitPrice(ing);
         const usageCount = countIngredientUsage(ing.id);
         const rowBg = idx % 2 === 1 ? 'bg-lavender-50/60' : 'bg-vanilla-50';
@@ -766,9 +776,9 @@
                 onchange="updateIngredientField('${ing.id}', 'unit', this.value)"
                 class="px-2.5 py-1.5 rounded-xl bg-lavender-100 border border-lavender-300 text-xs font-semibold text-plum-900 focus:outline-none focus:ring-2 focus:ring-plum-500"
               >
-                <option value="kg" ${ing.unit === 'kg' ? 'selected' : ''}>kg</option>
-                <option value="lt" ${ing.unit === 'lt' ? 'selected' : ''}>lt</option>
-                <option value="unid" ${ing.unit === 'unid' ? 'selected' : ''}>unid</option>
+                <option value="kg" ${currentUnit === 'kg' ? 'selected' : ''}>kg</option>
+                <option value="lt" ${currentUnit === 'lt' ? 'selected' : ''}>lt</option>
+                <option value="ud" ${currentUnit === 'ud' ? 'selected' : ''}>ud</option>
               </select>
             </td>
             <td class="py-3.5 px-4 text-right">
@@ -786,7 +796,7 @@
             </td>
             <td class="py-3.5 px-5 text-right bg-lavender-100/65 font-bold text-plum-950">
               <span class="text-base text-plum-600">${formatMoney(unitPrice)}</span>
-              <span class="text-xs font-normal text-mutedplum-600">/ ${ing.unit}</span>
+              <span class="text-xs font-normal text-mutedplum-600">/ ${currentUnit}</span>
             </td>
             <td class="py-3.5 px-4 text-center">
               <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${usageCount > 0 ? 'bg-lavender-200 text-plum-900' : 'bg-vanilla-200 text-mutedplum-600'}">
@@ -816,7 +826,7 @@
         if (!trimmed) return;
         ing.name = trimmed;
       } else if (field === 'unit') {
-        ing.unit = rawValue;
+        ing.unit = normalizeUnit(rawValue);
       } else if (field === 'buyQty') {
         const num = parseFloat(rawValue);
         if (isNaN(num) || num <= 0) {
@@ -900,7 +910,7 @@
       e.preventDefault();
       const name = document.getElementById('new-ing-name').value.trim();
       const buyQty = parseFloat(document.getElementById('new-ing-qty').value);
-      const unit = document.getElementById('new-ing-unit').value;
+      const unit = normalizeUnit(document.getElementById('new-ing-unit').value);
       const buyPrice = parseFloat(document.getElementById('new-ing-price').value);
 
       if (!name || isNaN(buyQty) || buyQty <= 0 || isNaN(buyPrice) || buyPrice < 0) {
@@ -933,7 +943,7 @@
         name: data.nombre ?? name,
         buyQty: Number(data.cantidad_compra ?? buyQty),
         buyPrice: Number(data.precio_compra ?? buyPrice),
-        unit: data.unidad_media ?? unit,
+        unit: normalizeUnit(data.unidad_media ?? unit),
         unitPriceRef: data.precio_unitario != null ? Number(data.precio_unitario) : unitPrice
       });
 
@@ -997,7 +1007,7 @@
 
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 pt-3 border-t border-plum-600/15">
                 <div class="bg-vanilla-50/95 px-3 py-2 rounded-2xl border border-lavender-300">
-                  <label class="block text-[10px] font-bold uppercase tracking-wider text-mutedplum-600">Rinde (Unid.)</label>
+                  <label class="block text-[10px] font-bold uppercase tracking-wider text-mutedplum-600">Rinde (ud)</label>
                   <div class="flex items-center gap-1 mt-0.5">
                     <input
                       type="number"
@@ -1007,7 +1017,7 @@
                       onchange="updateProductMeta('${prod.id}', 'yield', this.value)"
                       class="w-full font-bold text-sm text-plum-950 bg-transparent focus:outline-none focus:text-plum-600"
                     />
-                    <span class="text-xs text-mutedplum-600">unid</span>
+                    <span class="text-xs text-mutedplum-600">ud</span>
                   </div>
                 </div>
 
@@ -1094,7 +1104,7 @@
                 ${metrics.yieldUnits > 1 ? `
                   <span class="text-lavender-400/40 select-none shrink-0">|</span>
                   <div class="flex items-center gap-1 bg-plum-800 border border-lavender-400/35 px-2 py-1 rounded-xl shrink-0">
-                    <span class="text-[10px] uppercase tracking-wide text-lavender-200 font-semibold">x Unid (${metrics.yieldUnits}u):</span>
+                    <span class="text-[10px] uppercase tracking-wide text-lavender-200 font-semibold">x ud (${metrics.yieldUnits}u):</span>
                     <span class="text-xs font-extrabold text-vanilla-50">${formatMoney(metrics.unitSuggestedPrice)}</span>
                   </div>
                 ` : ''}
