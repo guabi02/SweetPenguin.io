@@ -102,7 +102,7 @@
           <div class="flex items-center gap-3.5">
             <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-full shadow-plum-sm bg-vanilla-100 flex items-center justify-center overflow-hidden">
               <img
-                src="SweetLogo.png"
+                src="/imágenes/SweetLogo.png"
                 alt="Logo Sweet Penguin"
                 style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover;"
               />
@@ -1049,7 +1049,7 @@
                     onkeydown="if (event.key === 'Enter') { event.preventDefault(); this.blur(); }"
                     title="Editar nombre del producto"
                     aria-label="Nombre del producto"
-                    class="w-full font-serif text-xl font-bold text-plum-950 leading-snug bg-transparent border border-transparent hover:border-plum-600/30 focus:border-plum-600 focus:bg-vanilla-50/95 rounded-xl px-2 py-0.5 -ml-2 focus:outline-none transition"
+                    class="w-full font-serif text-2xl sm:text-3xl font-bold text-plum-950 leading-snug bg-transparent border border-transparent hover:border-plum-600/30 focus:border-plum-600 focus:bg-vanilla-50/95 rounded-xl px-2 py-0.5 -ml-2 focus:outline-none transition"
                   />
                 </div>
                 <button onclick="deleteProduct('${prod.id}')" title="Eliminar producto" class="p-2 rounded-xl text-plum-800/60 hover:text-rose-700 hover:bg-vanilla-50/80 transition shrink-0">
@@ -1100,7 +1100,7 @@
                 ${metrics.lines.map(line => `
                   <div class="py-2 px-4 hover:bg-lavender-50/80 transition-colors flex items-center justify-between gap-2">
                     <div class="min-w-0 flex-1">
-                      <span class="text-xs sm:text-sm font-semibold text-plum-950 truncate block" title="${line.name}">${line.name}</span>
+                      <span class="text-sm sm:text-base font-semibold text-plum-950 truncate block" title="${line.name}">${line.name}</span>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
                       <div class="inline-flex items-center bg-white border border-lavender-300 rounded-lg px-1.5 py-0.5 focus-within:ring-2 focus-within:ring-plum-500">
@@ -1543,3 +1543,4 @@
   </script>
 </body>
 </html>
+```[cite: 1]
