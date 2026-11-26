@@ -268,7 +268,7 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-plum-900 mb-1">Cantidad de Compra *</label>
-            <input type="number" id="new-ing-qty" step="0.01" min="0.01" value="1" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
+            <input type="number" id="new-ing-qty" step="any" min="0.01" value="1" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
           </div>
           <div>
             <label class="block text-xs font-semibold text-plum-900 mb-1">Unidad de Medida *</label>
@@ -281,7 +281,7 @@
         </div>
         <div>
           <label class="block text-xs font-semibold text-plum-900 mb-1">Precio del Paquete / Compra ($) *</label>
-          <input type="number" id="new-ing-price" step="1" min="0" required placeholder="Ej. 12500" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
+          <input type="number" id="new-ing-price" step="any" min="0" required placeholder="Ej. 12500" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
         </div>
         <div class="flex justify-end gap-2 pt-3 border-t border-lavender-200">
           <button type="button" onclick="closeModal('modal-new-ingredient')" class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-lavender-100 text-plum-900 hover:bg-lavender-200">Cancelar</button>
@@ -320,7 +320,7 @@
             </div>
             <div>
               <label class="block text-xs font-semibold text-plum-900 mb-1">Ganancia (%) *</label>
-              <input type="number" id="new-prod-margin" min="0" step="1" value="100" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
+              <input type="number" id="new-prod-margin" min="0" step="any" value="100" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
             </div>
           </div>
         </div>
@@ -774,7 +774,7 @@
             <td class="py-3.5 px-4 text-center">
               <input
                 type="number"
-                step="0.01"
+                step="any"
                 min="0.01"
                 value="${ing.buyQty}"
                 onchange="updateIngredientField('${ing.id}', 'buyQty', this.value)"
@@ -796,7 +796,7 @@
                 <span class="text-mutedplum-600 text-xs mr-1">$</span>
                 <input
                   type="number"
-                  step="1"
+                  step="any"
                   min="0"
                   value="${ing.buyPrice}"
                   onchange="updateIngredientField('${ing.id}', 'buyPrice', this.value)"
@@ -1037,7 +1037,7 @@
                     <input
                       type="number"
                       min="0"
-                      step="1"
+                      step="any"
                       value="${metrics.marginPercent}"
                       onchange="updateProductMeta('${prod.id}', 'marginPercent', this.value)"
                       class="w-full font-bold text-sm text-plum-600 bg-transparent focus:outline-none focus:text-plum-950"
@@ -1064,7 +1064,7 @@
                       <div class="inline-flex items-center bg-white border border-lavender-300 rounded-lg px-1.5 py-0.5 focus-within:ring-2 focus-within:ring-plum-500">
                         <input
                           type="number"
-                          step="0.005"
+                          step="any"
                           min="0"
                           value="${line.qty}"
                           onchange="updateRecipeIngredientQty('${prod.id}', ${line.index}, this.value)"
@@ -1087,7 +1087,7 @@
                   ${optionsHtml}
                 </select>
                 <div class="flex items-center gap-2 shrink-0">
-                  <input type="number" id="add-ing-qty-${prod.id}" step="0.01" min="0.001" placeholder="Cant." class="w-24 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs font-semibold text-plum-950 text-center focus:outline-none focus:ring-2 focus:ring-plum-500">
+                  <input type="number" id="add-ing-qty-${prod.id}" step="any" min="0.001" placeholder="Cant." class="w-24 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs font-semibold text-plum-950 text-center focus:outline-none focus:ring-2 focus:ring-plum-500">
                   <button onclick="addIngredientToProduct('${prod.id}')" class="px-4 py-2 rounded-xl bg-plum-600 hover:bg-plum-800 text-vanilla-50 font-semibold text-xs whitespace-nowrap shadow-plum-sm transition cursor-pointer">
                     + Sumar
                   </button>
@@ -1343,7 +1343,7 @@
         <select class="temp-ing-id flex-1 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs text-plum-950">
           ${optionsHtml}
         </select>
-        <input type="number" step="0.005" min="0.001" placeholder="Cantidad" required class="temp-ing-qty w-24 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs text-plum-950 text-center">
+        <input type="number" step="any" min="0.001" placeholder="Cantidad" required class="temp-ing-qty w-24 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs text-plum-950 text-center">
         <button type="button" onclick="this.parentElement.remove()" class="p-2 text-mutedplum-600 hover:text-rose-700 text-xs">✕</button>
       `;
       list.appendChild(row);
