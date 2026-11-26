@@ -59,6 +59,7 @@
     const SUPABASE_KEY = "sb_publishable_nnEgBCI3BHMjT-8bKrmvyw_DlwwIlI8";
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     const IMAGES_BASE_URL = "https://guabi02.github.io/SweetPenguin.io/imagenes/";
+    const IMAGES_VERSION = "2";
   </script>
 
   <style>
@@ -368,8 +369,11 @@
     function getProductImageUrl(imageVal) {
       const clean = String(imageVal || '').trim();
       if (!clean) return '';
-      if (/^https?:\/\//i.test(clean)) return clean;
-      return `${IMAGES_BASE_URL}${clean.replace(/^\/?imagenes\//i, '')}`;
+      const baseUrl = /^https?:\/\//i.test(clean)
+        ? clean
+        : `${IMAGES_BASE_URL}${clean.replace(/^\/?imagenes\//i, '')}`;
+      const sep = baseUrl.includes('?') ? '&' : '?';
+      return `${baseUrl}${sep}v=${IMAGES_VERSION}`;
     }
 
     function normalizeText(str) {
