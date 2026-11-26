@@ -441,7 +441,7 @@
       });
 
       products = (productos || []).map(p => {
-        const rawCat = p["categoría"] ?? p.categoria ?? "";
+        const rawCat = p.categoria ?? p["categoría"] ?? "";
 
         const mpItems = (p.receta_ingredientes || []).map(item => ({
           id: item.id,
@@ -1382,7 +1382,7 @@
         .from('productos')
         .insert([{
           nombre: name,
-          "categoría": category,
+          categoria: category,
           rendimiento_unidades: yieldVal,
           multiplicador_ganancia: marginPercent
         }])
@@ -1429,7 +1429,7 @@
       products.push({
         id: createdProd.id,
         name: createdProd.nombre ?? name,
-        category: String(createdProd["categoría"] ?? createdProd.categoria ?? category).trim(),
+        category: String(createdProd.categoria ?? createdProd["categoría"] ?? category).trim(),
         yield: Number(createdProd.rendimiento_unidades ?? yieldVal),
         marginPercent: Number(createdProd.multiplicador_ganancia ?? marginPercent),
         ingredients: [
