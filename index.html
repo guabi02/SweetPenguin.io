@@ -418,7 +418,7 @@
           ingredientId: null,
           baseProductId: pb.id_base,
           qty: Number(pb.cantidad ?? 0),
-          note: 'Producto Base'
+          note: ''
         });
       });
 
@@ -431,7 +431,7 @@
           ingredientId: item.materia_prima_id,
           baseProductId: null,
           qty: Number(item.cantidad_usada ?? 0),
-          note: item.cantidad_detalle ?? ""
+          note: ''
         }));
 
         const baseItems = basePorProducto.get(String(p.id)) || [];
@@ -580,7 +580,6 @@
             name: baseProd ? baseProd.name : 'Producto base',
             unit: 'unid',
             qty,
-            note: 'Producto Base',
             unitPrice,
             subtotal
           };
@@ -601,7 +600,6 @@
           name: ing ? ing.name : (item.name || 'Ingrediente'),
           unit: ing ? ing.unit : (item.unit || 'unid'),
           qty,
-          note: item.note || '',
           unitPrice,
           subtotal
         };
@@ -1039,12 +1037,8 @@
               <div class="divide-y divide-lavender-200/80">
                 ${metrics.lines.map(line => `
                   <div class="py-2 px-4 hover:bg-lavender-50/80 transition-colors flex items-center justify-between gap-2">
-                    <div class="min-w-0 flex-1 flex items-center gap-1.5">
-                      <span class="text-xs sm:text-sm font-semibold text-plum-950 truncate" title="${line.name}${line.note ? ' — ' + line.note : ''}">${line.name}</span>
-                      ${line.type === 'base'
-                        ? `<span class="inline-block text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-plum-600/15 text-plum-800 border border-plum-600/20 shrink-0">Base</span>`
-                        : (line.note ? `<span class="hidden sm:inline-block text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-lavender-100 text-plum-700 shrink-0">${line.note}</span>` : '')
-                      }
+                    <div class="min-w-0 flex-1">
+                      <span class="text-xs sm:text-sm font-semibold text-plum-950 truncate block" title="${line.name}">${line.name}</span>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
                       <div class="inline-flex items-center bg-white border border-lavender-300 rounded-lg px-1.5 py-0.5 focus-within:ring-2 focus-within:ring-plum-500">
@@ -1241,14 +1235,16 @@
           ingredientId: null,
           baseProductId: data.id_base ?? Number(selectedId),
           qty: Number(data.cantidad ?? qty),
-          note: 'Producto Base'
+          note: ''
         });
       } else {
+        const ing = getIngredientById(selectedId);
         const { data, error } = await db
           .from('receta_ingredientes')
           .insert([{
             producto_id: Number(prod.id),
             materia_prima_id: Number(selectedId),
+            ingrediente_texto: ing?.name || '',
             cantidad_usada: qty
           }])
           .select()
@@ -1266,7 +1262,7 @@
           ingredientId: data.materia_prima_id ?? Number(selectedId),
           baseProductId: null,
           qty: Number(data.cantidad_usada ?? qty),
-          note: data.cantidad_detalle ?? ''
+          note: ''
         });
       }
 
@@ -1384,6 +1380,7 @@
         const rowsToInsert = mpRecipeItems.map(item => ({
           producto_id: createdProd.id,
           materia_prima_id: item.ingredientId,
+          ingrediente_texto: getIngredientById(item.ingredientId)?.name || '',
           cantidad_usada: item.qty
         }));
         const { data, error } = await db.from('receta_ingredientes').insert(rowsToInsert).select();
@@ -1422,7 +1419,7 @@
             ingredientId: it.materia_prima_id,
             baseProductId: null,
             qty: Number(it.cantidad_usada),
-            note: it.cantidad_detalle ?? ''
+            note: ''
           })),
           ...createdBaseItems.map(it => ({
             id: it.id ?? null,
@@ -1430,7 +1427,7 @@
             ingredientId: null,
             baseProductId: it.id_base,
             qty: Number(it.cantidad),
-            note: 'Producto Base'
+            note: ''
           }))
         ]
       });
