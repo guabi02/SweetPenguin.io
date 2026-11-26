@@ -1071,12 +1071,12 @@
 
                 <div class="flex items-center gap-2 shrink-0">
                   ${imageUrl ? `
-                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden bg-vanilla-50/95 border border-lavender-300 shadow-plum-sm shrink-0">
+                    <div class="w-24 h-24 sm:w-28 sm:h-28 overflow-hidden shrink-0 flex items-center justify-center">
                       <img
                         src="${imageUrl.replace(/"/g, '&quot;')}"
                         alt="${safeName}"
                         onerror="this.parentElement.classList.add('hidden')"
-                        class="w-full h-full object-cover block"
+                        class="w-full h-full object-contain block"
                       />
                     </div>
                   ` : ''}
