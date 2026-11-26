@@ -179,10 +179,6 @@
         <div class="flex items-center gap-2 flex-wrap">
           <select id="filter-category" onchange="renderProductos()" class="px-3.5 py-2.5 rounded-xl bg-vanilla-100 border border-lavender-300 text-sm font-medium text-plum-900 focus:outline-none focus:ring-2 focus:ring-plum-500">
             <option value="all">Todas las categorías</option>
-            <option value="Tortas">Tortas (26cm + Packaging)</option>
-            <option value="Cookies y Alfajores">Cookies y Alfajores</option>
-            <option value="Budines y Bizcochuelos">Budines y Bizcochuelos</option>
-            <option value="Bases y Cremas">Bases, Cremas y Otros</option>
           </select>
           <button onclick="toggleAllCards()" id="btn-toggle-all" class="px-3.5 py-2.5 rounded-xl bg-lavender-100 hover:bg-lavender-200 border border-lavender-300 text-xs font-semibold text-plum-900 transition">
             Contraer / Expandir
@@ -314,12 +310,8 @@
           </div>
           <div>
             <label class="block text-xs font-semibold text-plum-900 mb-1">Categoría</label>
-            <select id="new-prod-cat" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
-              <option value="Tortas">Tortas (26cm + Packaging)</option>
-              <option value="Cookies y Alfajores">Cookies y Alfajores</option>
-              <option value="Budines y Bizcochuelos">Budines y Bizcochuelos</option>
-              <option value="Bases y Cremas">Bases, Cremas y Otros</option>
-            </select>
+            <input type="text" id="new-prod-cat" list="categories-datalist" placeholder="Ej. Tortas, Cookies, Budines..." class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-lavender-300 text-sm text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
+            <datalist id="categories-datalist"></datalist>
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
@@ -368,6 +360,12 @@
     let products = [];
     let allCollapsed = false;
 
+    function extractCategoryName(row) {
+      if (!row || typeof row !== 'object') return '';
+      const raw = row.category ?? row.categoria ?? row.nombre ?? row.name ?? '';
+      return String(raw).trim();
+    }
+
     async function cargarDatos() {
       const { data: materias_primas, error: errMp } = await db
         .from("materias_primas")
@@ -379,10 +377,16 @@
         .select("*, receta_ingredientes(*)")
         .order("nombre", { ascending: true });
 
+      // Intento opcional de leer una tabla "categorias" si existe en tu esquema
+      const { data: categoriasTabla } = await db
+        .from("categorias")
+        .select("*");
+
       if (errMp || errProd) {
         console.error("Error cargando desde Supabase:", errMp || errProd);
         showToast("No se pudieron cargar los datos de Supabase", "error");
         updateNavBadges();
+        renderCategoryFilter(categoriasTabla || []);
         renderProductos();
         renderIngredientes();
         return;
@@ -392,27 +396,88 @@
         id: r.id,
         name: r.name ?? r.nombre ?? "",
         buyQty: Number(r.buyQty ?? r.cantidad_compra ?? 1),
-        buyPrice: Number(r.buyPrice ?? r.precio_compra ?? 0),
-        unit: r.unit ?? r.unidad_medida ?? "kg"
+        buyPrice: Number(r.buyPrice ?? r.precio_paquete ?? r.precio_compra ?? 0),
+        unit: r.unit ?? r.unidad ?? r.unidad_medida ?? "kg"
       }));
 
-      products = (productos || []).map(p => ({
-        id: p.id,
-        name: p.name ?? p.nombre ?? "",
-        category: p.category ?? p.categoria ?? "General",
-        yield: Number(p.yield ?? p.rendimiento_unidades ?? 1),
-        marginPercent: Number(p.marginPercent ?? p.multiplicador_ganancia ?? 0),
-        ingredients: (p.receta_ingredientes || []).map(item => ({
-          id: item.id,
-          ingredientId: item.ingredientId ?? item.materia_prima_id ?? item.ingrediente_id,
-          qty: Number(item.qty ?? item.cantidad_usada ?? 0),
-          note: item.note ?? item.detalle_uso ?? ""
-        }))
-      }));
+      products = (productos || []).map(p => {
+        const rawCat =
+          p.category ??
+          p.categoria ??
+          p.categoria_nombre ??
+          (typeof p.categorias === 'object' && p.categorias ? (p.categorias.nombre ?? p.categorias.name) : '') ??
+          "";
+
+        return {
+          id: p.id,
+          name: p.name ?? p.nombre ?? "",
+          category: String(rawCat).trim() || "Sin categoría",
+          yield: Number(p.yield ?? p.rinde_unidades ?? p.rendimiento_unidades ?? 1),
+          marginPercent: Number(p.marginPercent ?? p.multiplicador_ganancia ?? 0),
+          ingredients: (p.receta_ingredientes || []).map(item => ({
+            id: item.id,
+            ingredientId: item.ingredientId ?? item.materia_prima_id ?? item.ingrediente_id,
+            qty: Number(item.qty ?? item.cantidad_usada ?? 0),
+            note: item.note ?? item.detalle_uso ?? ""
+          }))
+        };
+      });
 
       updateNavBadges();
+      renderCategoryFilter(categoriasTabla || []);
       renderProductos();
       renderIngredientes();
+    }
+
+    function getUniqueCategories(extraRows = []) {
+      const map = new Map();
+
+      const addCat = (val) => {
+        const clean = String(val || '').trim();
+        if (!clean) return;
+        const key = clean.toLowerCase();
+        if (!map.has(key)) {
+          map.set(key, clean);
+        }
+      };
+
+      (extraRows || []).forEach(r => addCat(extractCategoryName(r)));
+      products.forEach(p => addCat(p.category));
+
+      return Array.from(map.values()).sort((a, b) =>
+        a.localeCompare(b, 'es', { sensitivity: 'base' })
+      );
+    }
+
+    function renderCategoryFilter(extraRows = []) {
+      const selectEl = document.getElementById('filter-category');
+      const datalistEl = document.getElementById('categories-datalist');
+      if (!selectEl) return;
+
+      const previousValue = selectEl.value || 'all';
+      const categories = getUniqueCategories(extraRows);
+
+      selectEl.innerHTML = `<option value="all">Todas las categorías</option>` + categories
+        .map(cat => `<option value="${cat.replace(/"/g, '&quot;')}">${cat}</option>`)
+        .join('');
+
+      const exists = Array.from(selectEl.options).some(
+        opt => opt.value.toLowerCase() === previousValue.toLowerCase()
+      );
+      if (exists) {
+        const matched = Array.from(selectEl.options).find(
+          opt => opt.value.toLowerCase() === previousValue.toLowerCase()
+        );
+        selectEl.value = matched ? matched.value : 'all';
+      } else {
+        selectEl.value = 'all';
+      }
+
+      if (datalistEl) {
+        datalistEl.innerHTML = categories
+          .map(cat => `<option value="${cat.replace(/"/g, '&quot;')}"></option>`)
+          .join('');
+      }
     }
 
     const currencyFormatter = new Intl.NumberFormat('es-AR', {
@@ -465,7 +530,6 @@
         };
       });
 
-      // Ordenar alfabéticamente en español (ignora mayúsculas y tildes correctamente)
       lines.sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
 
       const marginPercent = Number(product.marginPercent) || 0;
@@ -506,6 +570,7 @@
         tabIng.className = inactiveTabClass;
         badgeProd.className = 'w-6 h-6 rounded-full bg-plum-950/75 text-vanilla-50 text-[11px] font-bold flex items-center justify-center tabular-nums shrink-0';
         badgeIng.className = 'w-6 h-6 rounded-full bg-lavender-300/80 text-plum-950 text-[11px] font-bold flex items-center justify-center tabular-nums shrink-0';
+        renderCategoryFilter();
         renderProductos();
       } else {
         viewIng.classList.remove('hidden');
@@ -784,12 +849,15 @@
     }
 
     function renderProductos() {
+      renderCategoryFilter();
+
       const grid = document.getElementById('productos-grid');
       const search = (document.getElementById('search-productos').value || '').toLowerCase().trim();
-      const categoryFilter = document.getElementById('filter-category').value;
+      const categoryFilter = (document.getElementById('filter-category').value || 'all').trim().toLowerCase();
 
       const filtered = products.filter(prod => {
-        const matchesCat = categoryFilter === 'all' || prod.category === categoryFilter;
+        const prodCat = String(prod.category || '').trim().toLowerCase();
+        const matchesCat = categoryFilter === 'all' || prodCat === categoryFilter;
         const inName = String(prod.name || '').toLowerCase().includes(search);
         const inIngredients = (prod.ingredients || []).some(item => {
           const ing = getIngredientById(item.ingredientId);
@@ -820,7 +888,7 @@
               <div class="flex items-start justify-between gap-3">
                 <div>
                   <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-vanilla-50/90 text-plum-800 border border-lavender-300 mb-1.5">
-                    ${prod.category || 'Pastelería'}
+                    ${prod.category || 'Sin categoría'}
                   </span>
                   <h3 class="font-serif text-xl font-bold text-plum-950 leading-snug">${prod.name}</h3>
                 </div>
@@ -1085,7 +1153,9 @@
     }
 
     function openNewProductModal() {
+      renderCategoryFilter();
       document.getElementById('new-prod-name').value = '';
+      document.getElementById('new-prod-cat').value = '';
       document.getElementById('new-prod-yield').value = '1';
       document.getElementById('new-prod-margin').value = '100';
       const list = document.getElementById('new-prod-ingredients-list');
@@ -1115,7 +1185,7 @@
     async function handleAddProduct(e) {
       e.preventDefault();
       const name = document.getElementById('new-prod-name').value.trim();
-      const category = document.getElementById('new-prod-cat').value;
+      const category = document.getElementById('new-prod-cat').value.trim() || 'Sin categoría';
       const yieldVal = Math.max(1, parseInt(document.getElementById('new-prod-yield').value, 10) || 1);
       const marginPercent = parseFloat(document.getElementById('new-prod-margin').value) || 0;
 
@@ -1170,7 +1240,7 @@
       products.push({
         id: createdProd.id,
         name: createdProd.nombre ?? name,
-        category: createdProd.categoria ?? category,
+        category: String(createdProd.categoria ?? category).trim(),
         yield: Number(createdProd.rinde_unidades ?? yieldVal),
         marginPercent: Number(createdProd.multiplicador_ganancia ?? marginPercent),
         ingredients: (createdItems || rowsToInsert).map(it => ({
