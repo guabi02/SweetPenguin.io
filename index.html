@@ -916,51 +916,62 @@
     }
 
     async function handleAddIngredient(e) {
-      e.preventDefault();
-      const name = document.getElementById('new-ing-name').value.trim();
-      const buyQty = parseFloat(document.getElementById('new-ing-qty').value);
-      const unit = normalizeUnit(document.getElementById('new-ing-unit').value);
-      const buyPrice = parseFloat(document.getElementById('new-ing-price').value);
+  e.preventDefault();
+  const name = document.getElementById('new-ing-name').value.trim();
+  const buyQty = parseFloat(document.getElementById('new-ing-qty').value);
+  const unit = normalizeUnit(document.getElementById('new-ing-unit').value);
+  const buyPrice = parseFloat(document.getElementById('new-ing-price').value);
 
-      if (!name || isNaN(buyQty) || buyQty <= 0 || isNaN(buyPrice) || buyPrice < 0) {
-        showToast('Completa todos los campos correctamente', 'error');
-        return;
-      }
+  if (!name || isNaN(buyQty) || buyQty <= 0 || isNaN(buyPrice) || buyPrice < 0) {
+    showToast('Completa todos los campos correctamente', 'error');
+    return;
+  }
 
-      const unitPrice = buyPrice / buyQty;
+  const unitPrice = buyPrice / buyQty;
 
-      const { data, error } = await db
-        .from('materias_primas')
-        .insert([{
-          nombre: name,
-          cantidad_compra: buyQty,
-          precio_compra: buyPrice,
-          unidad_media: unit,
-        }])
-        .select()
-        .single();
+  const { data, error } = await db
+    .from('materias_primas')
+    .insert([{
+      nombre: name,
+      cantidad_compra: buyQty,
+      precio_compra: buyPrice,
+      precio_unitario: unitPrice
+    }])
+    .select()
+    .single();
 
-      if (error) {
-        console.error('Error agregando materia prima:', error);
-        showToast('No se pudo guardar en Supabase', 'error');
-        return;
-      }
+  if (error) {
+    console.error('Error agregando materia prima:', error);
+    showToast('No se pudo guardar en Supabase', 'error');
+    return;
+  }
 
-      ingredients.push({
-        id: data.id,
-        name: data.nombre ?? name,
-        buyQty: Number(data.cantidad_compra ?? buyQty),
-        buyPrice: Number(data.precio_compra ?? buyPrice),
-        unit: normalizeUnit(data.unidad_media ?? unit),
-        unitPriceRef: data.precio_unitario != null ? Number(data.precio_unitario) : unitPrice
-      });
-
-      updateNavBadges();
-      closeModal('modal-new-ingredient');
-      renderIngredientes();
-      renderProductos();
-      showToast(`Ingrediente "${name}" agregado`);
+  let finalUnit = normalizeUnit(data.unidad_media ?? unit);
+  if (unit !== 'kg') {
+    const { error: errUnit } = await db
+      .from('materias_primas')
+      .update({ unidad_media: unit })
+      .eq('id', data.id);
+    if (!errUnit) {
+      finalUnit = unit;
     }
+  }
+
+  ingredients.push({
+    id: data.id,
+    name: data.nombre ?? name,
+    buyQty: Number(data.cantidad_compra ?? buyQty),
+    buyPrice: Number(data.precio_compra ?? buyPrice),
+    unit: finalUnit,
+    unitPriceRef: data.precio_unitario != null ? Number(data.precio_unitario) : unitPrice
+  });
+
+  updateNavBadges();
+  closeModal('modal-new-ingredient');
+  renderIngredientes();
+  renderProductos();
+  showToast(`Ingrediente "${name}" agregado`);
+}
 
     function renderProductos() {
       renderCategoryFilter();
