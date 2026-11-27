@@ -590,6 +590,7 @@
       }).join('');
 
       return `
+        <option value="" selected disabled>Seleccionar ingrediente o base...</option>
         <optgroup label="Materia Prima">
           ${mpOptions}
         </optgroup>
@@ -1358,7 +1359,12 @@
       const rawSelection = selectEl?.value || '';
       const qty = parseFloat(qtyEl?.value);
 
-      if (!rawSelection || isNaN(qty) || qty <= 0) {
+      if (!rawSelection) {
+        showToast('Selecciona un ingrediente o producto base', 'error');
+        return;
+      }
+
+      if (isNaN(qty) || qty <= 0) {
         showToast('Ingresa una cantidad válida mayor a 0', 'error');
         return;
       }
@@ -1480,7 +1486,7 @@
       const optionsHtml = buildComponentOptionsHtml();
 
       row.innerHTML = `
-        <select class="temp-ing-id flex-1 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs text-plum-950">
+        <select required class="temp-ing-id flex-1 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs text-plum-950">
           ${optionsHtml}
         </select>
         <input type="number" step="any" min="0.001" placeholder="Cantidad" required class="temp-ing-qty w-24 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs text-plum-950 text-center">
