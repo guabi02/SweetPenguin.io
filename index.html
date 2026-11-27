@@ -672,6 +672,12 @@
       };
     }
 
+    function getComparablePrice(metrics) {
+      return metrics.yieldUnits > 1
+        ? metrics.unitSuggestedPrice
+        : metrics.finalPrice;
+    }
+
     const baseTabClass = 'flex-1 md:flex-initial w-44 sm:w-48 h-12 px-4 rounded-[22px] flex items-center justify-between gap-2 text-xs font-bold leading-tight transition-all duration-200 cursor-pointer';
     const activeTabClass = `${baseTabClass} bg-plum-600 text-vanilla-50 shadow-plum-sm`;
     const inactiveTabClass = `${baseTabClass} text-plum-950 hover:bg-lavender-200/70`;
@@ -1061,12 +1067,12 @@
 
       withMetrics.sort((a, b) => {
         if (sortOrder === 'price_desc') {
-          return b.metrics.finalPrice - a.metrics.finalPrice;
+          return getComparablePrice(b.metrics) - getComparablePrice(a.metrics);
         }
         if (sortOrder === 'name_asc') {
           return a.prod.name.localeCompare(b.prod.name, 'es', { sensitivity: 'base' });
         }
-        return a.metrics.finalPrice - b.metrics.finalPrice;
+        return getComparablePrice(a.metrics) - getComparablePrice(b.metrics);
       });
 
       grid.innerHTML = withMetrics.map(({ prod, metrics }) => {
