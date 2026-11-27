@@ -182,6 +182,11 @@
           <select id="filter-category" onchange="renderProductos()" class="px-3.5 py-2.5 rounded-xl bg-vanilla-100 border border-lavender-300 text-sm font-medium text-plum-900 focus:outline-none focus:ring-2 focus:ring-plum-500">
             <option value="all">Todas las categorías</option>
           </select>
+          <select id="sort-productos" onchange="renderProductos()" class="px-3.5 py-2.5 rounded-xl bg-vanilla-100 border border-lavender-300 text-sm font-medium text-plum-900 focus:outline-none focus:ring-2 focus:ring-plum-500">
+            <option value="price_asc">Precio: menor a mayor</option>
+            <option value="price_desc">Precio: mayor a menor</option>
+            <option value="name_asc">Nombre (A–Z)</option>
+          </select>
           <button onclick="toggleAllCards()" id="btn-toggle-all" class="px-3.5 py-2.5 rounded-xl bg-lavender-100 hover:bg-lavender-200 border border-lavender-300 text-xs font-semibold text-plum-900 transition">
             Contraer / Expandir
           </button>
@@ -1022,6 +1027,7 @@
       const grid = document.getElementById('productos-grid');
       const search = normalizeText(document.getElementById('search-productos').value);
       const categoryFilter = normalizeText(document.getElementById('filter-category').value || 'all');
+      const sortOrder = document.getElementById('sort-productos')?.value || 'price_asc';
 
       const filtered = products.filter(prod => {
         const prodCat = normalizeText(prod.category);
@@ -1048,8 +1054,22 @@
         return;
       }
 
-      grid.innerHTML = filtered.map(prod => {
-        const metrics = calculateProductMetrics(prod);
+      const withMetrics = filtered.map(prod => ({
+        prod,
+        metrics: calculateProductMetrics(prod)
+      }));
+
+      withMetrics.sort((a, b) => {
+        if (sortOrder === 'price_desc') {
+          return b.metrics.finalPrice - a.metrics.finalPrice;
+        }
+        if (sortOrder === 'name_asc') {
+          return a.prod.name.localeCompare(b.prod.name, 'es', { sensitivity: 'base' });
+        }
+        return a.metrics.finalPrice - b.metrics.finalPrice;
+      });
+
+      grid.innerHTML = withMetrics.map(({ prod, metrics }) => {
         const optionsHtml = buildComponentOptionsHtml(prod.id);
         const imageUrl = getProductImageUrl(prod.image);
         const safeName = String(prod.name || '').replace(/"/g, '&quot;');
