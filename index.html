@@ -124,7 +124,7 @@
           <button
             id="tab-productos"
             onclick="switchView('productos')"
-            class="flex-1 md:flex-initial w-44 sm:w-48 h-12 px-4 rounded-[22px] flex items-center justify-between gap-2 text-xs font-bold leading-tight transition-all duration-200 cursor-pointer bg-plum-600 text-vanilla-50 shadow-plum-sm"
+            class="flex-1 md:flex-initial md:w-48 h-11 sm:h-12 px-3.5 sm:px-4 rounded-[22px] flex items-center justify-between gap-2 text-xs font-bold leading-tight transition-all duration-200 cursor-pointer bg-plum-600 text-vanilla-50 shadow-plum-sm"
           >
             <span class="flex items-center gap-2">
               <span>🧁</span>
@@ -136,7 +136,7 @@
           <button
             id="tab-ingredientes"
             onclick="switchView('ingredientes')"
-            class="flex-1 md:flex-initial w-44 sm:w-48 h-12 px-4 rounded-[22px] flex items-center justify-between gap-2 text-xs font-bold leading-tight transition-all duration-200 cursor-pointer text-plum-950 hover:bg-lavender-200/70"
+            class="flex-1 md:flex-initial md:w-48 h-11 sm:h-12 px-3.5 sm:px-4 rounded-[22px] flex items-center justify-between gap-2 text-xs font-bold leading-tight transition-all duration-200 cursor-pointer text-plum-950 hover:bg-lavender-200/70"
           >
             <span class="flex items-center gap-2">
               <span>🧈</span>
@@ -151,20 +151,20 @@
   </header>
 
   <!-- Toast / Notificación flotante -->
-  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <div id="toast-container" class="fixed bottom-4 right-4 sm:bottom-5 sm:right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
   <!-- Contenido Principal -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
 
     <!-- VISTA 2 (INICIAL): PRODUCTOS Y RECETAS -->
-    <section id="view-productos" class="space-y-6">
-      <div class="bg-gradient-to-r from-vanilla-50 via-lavender-100/80 to-vanilla-50 rounded-3xl p-5 sm:p-6 border border-lavender-300 shadow-plum-sm">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <section id="view-productos" class="space-y-5 sm:space-y-6">
+      <div class="bg-gradient-to-r from-vanilla-50 via-lavender-100/80 to-vanilla-50 rounded-3xl p-4 sm:p-6 border border-lavender-300 shadow-plum-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
           <div>
             <h2 class="font-serif text-2xl sm:text-3xl font-bold text-plum-950">Productos</h2>
           </div>
           <div class="flex flex-wrap items-center gap-3">
-            <button onclick="openNewProductModal()" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-semibold bg-plum-600 hover:bg-plum-800 text-vanilla-50 shadow-plum-md transition cursor-pointer">
+            <button onclick="openNewProductModal()" class="w-full sm:w-auto justify-center inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-semibold bg-plum-600 hover:bg-plum-800 text-vanilla-50 shadow-plum-md transition cursor-pointer">
               <svg class="w-5 h-5 text-lavender-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
               Nuevo Producto
             </button>
@@ -173,39 +173,39 @@
       </div>
 
       <!-- Barra de Búsqueda y Filtros -->
-      <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-vanilla-50 p-4 rounded-2xl border border-lavender-300 shadow-plum-sm">
+      <div class="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between bg-vanilla-50 p-3.5 sm:p-4 rounded-2xl border border-lavender-300 shadow-plum-sm">
         <div class="relative flex-1">
           <svg class="w-5 h-5 text-plum-600/60 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
           <input type="text" id="search-productos" oninput="renderProductos()" placeholder="Buscar torta, cookie, budín, base o ingrediente..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-vanilla-100 border border-lavender-300 text-sm text-plum-950 placeholder-mutedplum-600/60 focus:outline-none focus:ring-2 focus:ring-plum-500 focus:bg-vanilla-50 transition">
         </div>
-        <div class="flex items-center gap-2 flex-wrap">
-          <select id="filter-category" onchange="renderProductos()" class="px-3.5 py-2.5 rounded-xl bg-vanilla-100 border border-lavender-300 text-sm font-medium text-plum-900 focus:outline-none focus:ring-2 focus:ring-plum-500">
+        <div class="grid grid-cols-2 sm:flex items-center gap-2">
+          <select id="filter-category" onchange="renderProductos()" class="px-3 py-2.5 rounded-xl bg-vanilla-100 border border-lavender-300 text-xs sm:text-sm font-medium text-plum-900 focus:outline-none focus:ring-2 focus:ring-plum-500">
             <option value="all">Todas las categorías</option>
           </select>
-          <select id="sort-productos" onchange="renderProductos()" class="px-3.5 py-2.5 rounded-xl bg-vanilla-100 border border-lavender-300 text-sm font-medium text-plum-900 focus:outline-none focus:ring-2 focus:ring-plum-500">
+          <select id="sort-productos" onchange="renderProductos()" class="px-3 py-2.5 rounded-xl bg-vanilla-100 border border-lavender-300 text-xs sm:text-sm font-medium text-plum-900 focus:outline-none focus:ring-2 focus:ring-plum-500">
             <option value="price_asc">Precio: menor a mayor</option>
             <option value="price_desc">Precio: mayor a menor</option>
             <option value="name_asc">Nombre (A–Z)</option>
           </select>
-          <button onclick="toggleAllCards()" id="btn-toggle-all" class="px-3.5 py-2.5 rounded-xl bg-lavender-100 hover:bg-lavender-200 border border-lavender-300 text-xs font-semibold text-plum-900 transition">
+          <button onclick="toggleAllCards()" id="btn-toggle-all" class="col-span-2 sm:col-auto px-3.5 py-2.5 rounded-xl bg-lavender-100 hover:bg-lavender-200 border border-lavender-300 text-xs font-semibold text-plum-900 transition cursor-pointer">
             Contraer / Expandir
           </button>
         </div>
       </div>
 
       <!-- Grid de Tarjetas de Productos -->
-      <div id="productos-grid" class="grid grid-cols-1 xl:grid-cols-2 gap-6"></div>
+      <div id="productos-grid" class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6"></div>
     </section>
 
     <!-- VISTA 1: MATERIA PRIMA -->
-    <section id="view-ingredientes" class="hidden space-y-6">
-      <div class="bg-gradient-to-r from-vanilla-50 via-lavender-100/80 to-vanilla-50 rounded-3xl p-5 sm:p-6 border border-lavender-300 shadow-plum-sm">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <section id="view-ingredientes" class="hidden space-y-5 sm:space-y-6">
+      <div class="bg-gradient-to-r from-vanilla-50 via-lavender-100/80 to-vanilla-50 rounded-3xl p-4 sm:p-6 border border-lavender-300 shadow-plum-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
           <div>
             <h2 class="font-serif text-2xl sm:text-3xl font-bold text-plum-950">Materia Prima</h2>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <button onclick="openNewIngredientModal()" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-semibold bg-plum-600 hover:bg-plum-800 text-vanilla-50 shadow-plum-md transition cursor-pointer">
+            <button onclick="openNewIngredientModal()" class="w-full sm:w-auto justify-center inline-flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-semibold bg-plum-600 hover:bg-plum-800 text-vanilla-50 shadow-plum-md transition cursor-pointer">
               <svg class="w-5 h-5 text-lavender-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
               Agregar Ingrediente
             </button>
@@ -214,13 +214,13 @@
       </div>
 
       <!-- Buscador y Filtro de Unidad -->
-      <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-vanilla-50 p-4 rounded-2xl border border-lavender-300 shadow-plum-sm">
+      <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-vanilla-50 p-3.5 sm:p-4 rounded-2xl border border-lavender-300 shadow-plum-sm">
         <div class="relative flex-1">
           <svg class="w-5 h-5 text-plum-600/60 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
           <input type="text" id="search-ingredientes" oninput="renderIngredientes()" placeholder="Buscar ingrediente (ej. Manteca, Chocolate, Dulce de leche)..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-vanilla-100 border border-lavender-300 text-sm text-plum-950 placeholder-mutedplum-600/60 focus:outline-none focus:ring-2 focus:ring-plum-500 focus:bg-vanilla-50 transition">
         </div>
         <div class="flex items-center gap-2">
-          <select id="filter-unidad" onchange="renderIngredientes()" class="px-3.5 py-2.5 rounded-xl bg-vanilla-100 border border-lavender-300 text-sm font-medium text-plum-900 focus:outline-none focus:ring-2 focus:ring-plum-500">
+          <select id="filter-unidad" onchange="renderIngredientes()" class="w-full sm:w-auto px-3.5 py-2.5 rounded-xl bg-vanilla-100 border border-lavender-300 text-xs sm:text-sm font-medium text-plum-900 focus:outline-none focus:ring-2 focus:ring-plum-500">
             <option value="all">Todas las unidades</option>
             <option value="kg">Por Kilogramo (kg)</option>
             <option value="lt">Por Litro (lt)</option>
@@ -232,7 +232,7 @@
       <!-- Tabla Interactiva de Ingredientes -->
       <div class="bg-vanilla-50 rounded-3xl border border-lavender-300 shadow-plum-md overflow-hidden">
         <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
+          <table class="w-full text-left border-collapse min-w-[680px]">
             <thead>
               <tr class="bg-lavender-400/55 border-b border-lavender-300 text-xs font-bold uppercase tracking-wider text-plum-950">
                 <th class="py-4 px-5">Ingrediente / Insumo</th>
@@ -254,7 +254,7 @@
 
   <!-- Footer -->
   <footer class="bg-vanilla-50/90 border-t border-lavender-300 py-5 mt-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-mutedplum-600">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-mutedplum-600 text-center sm:text-left">
       <p><strong class="text-plum-900">Sweet Pengüin</strong> • Sistema de Gestión de Costos y Recetas de Pastelería</p>
       <p>Conectado a Supabase</p>
     </div>
@@ -262,7 +262,7 @@
 
   <!-- MODAL 1: AGREGAR NUEVO INGREDIENTE -->
   <div id="modal-new-ingredient" class="hidden fixed inset-0 z-50 bg-plum-950/55 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-vanilla-50 rounded-3xl border border-lavender-300 shadow-plum-lg max-w-md w-full p-6 space-y-5">
+    <div class="bg-vanilla-50 rounded-3xl border border-lavender-300 shadow-plum-lg max-w-md w-full p-5 sm:p-6 space-y-5">
       <div class="flex items-center justify-between border-b border-lavender-200 pb-3">
         <h3 class="font-serif text-xl font-bold text-plum-950">Nuevo Ingrediente</h3>
         <button onclick="closeModal('modal-new-ingredient')" class="p-1.5 rounded-xl hover:bg-lavender-100 text-plum-700">✕</button>
@@ -299,9 +299,9 @@
   </div>
 
   <!-- MODAL 2: CREAR NUEVO PRODUCTO / RECETA -->
-  <div id="modal-new-product" class="hidden fixed inset-0 z-50 bg-plum-950/55 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="modal-new-product" class="hidden fixed inset-0 z-50 bg-plum-950/55 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
     <div class="bg-vanilla-50 rounded-3xl border border-lavender-300 shadow-plum-lg max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
-      <div class="flex items-center justify-between px-6 py-4 bg-lavender-100 border-b border-lavender-300">
+      <div class="flex items-center justify-between px-5 sm:px-6 py-4 bg-lavender-100 border-b border-lavender-300">
         <div>
           <h3 class="font-serif text-xl font-bold text-plum-950">Crear Nuevo Producto</h3>
           <p class="text-xs text-mutedplum-600">Define el nombre, rinde, ganancia y selecciona materias primas o productos base.</p>
@@ -309,7 +309,7 @@
         <button onclick="closeModal('modal-new-product')" class="p-1.5 rounded-xl hover:bg-lavender-200 text-plum-800">✕</button>
       </div>
 
-      <form onsubmit="handleAddProduct(event)" class="p-6 overflow-y-auto space-y-5 flex-1">
+      <form onsubmit="handleAddProduct(event)" class="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="sm:col-span-2">
             <label class="block text-xs font-semibold text-plum-900 mb-1">Nombre del Producto *</label>
@@ -336,7 +336,7 @@
           </div>
         </div>
 
-        <div class="bg-lavender-50 p-4 rounded-2xl border border-lavender-300 space-y-3">
+        <div class="bg-lavender-50 p-3.5 sm:p-4 rounded-2xl border border-lavender-300 space-y-3">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold uppercase tracking-wider text-plum-900">Ingredientes y Productos Base</span>
             <button type="button" onclick="addTempRecipeRow()" class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-lavender-400/50 text-plum-950 hover:bg-lavender-400/80 transition">
@@ -590,7 +590,7 @@
       }).join('');
 
       return `
-        <option value="" selected disabled>Seleccionar ingrediente o base...</option>
+        <option value="" selected></option>
         <optgroup label="Materia Prima">
           ${mpOptions}
         </optgroup>
@@ -679,7 +679,7 @@
         : metrics.finalPrice;
     }
 
-    const baseTabClass = 'flex-1 md:flex-initial w-44 sm:w-48 h-12 px-4 rounded-[22px] flex items-center justify-between gap-2 text-xs font-bold leading-tight transition-all duration-200 cursor-pointer';
+    const baseTabClass = 'flex-1 md:flex-initial md:w-48 h-11 sm:h-12 px-3.5 sm:px-4 rounded-[22px] flex items-center justify-between gap-2 text-xs font-bold leading-tight transition-all duration-200 cursor-pointer';
     const activeTabClass = `${baseTabClass} bg-plum-600 text-vanilla-50 shadow-plum-sm`;
     const inactiveTabClass = `${baseTabClass} text-plum-950 hover:bg-lavender-200/70`;
 
@@ -1083,8 +1083,8 @@
 
         return `
           <article class="bg-vanilla-50 rounded-3xl border border-lavender-300 shadow-plum-md hover:shadow-plum-lg transition-shadow flex flex-col overflow-hidden">
-            <div class="p-5 bg-gradient-to-r from-lavender-400/55 via-lavender-200/75 to-lavender-400/45 border-b border-lavender-300">
-              <div class="flex items-start justify-between gap-3">
+            <div class="p-4 sm:p-5 bg-gradient-to-r from-lavender-400/55 via-lavender-200/75 to-lavender-400/45 border-b border-lavender-300">
+              <div class="flex items-start justify-between gap-2.5 sm:gap-3">
                 <div class="flex-1 min-w-0">
                   <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-vanilla-50/90 text-plum-800 border border-lavender-300 mb-1.5">
                     ${prod.category || 'Sin categoría'}
@@ -1096,13 +1096,13 @@
                     onkeydown="if (event.key === 'Enter') { event.preventDefault(); this.blur(); }"
                     title="Editar nombre del producto"
                     aria-label="Nombre del producto"
-                    class="w-full font-serif text-2xl sm:text-3xl font-bold text-plum-950 leading-snug bg-transparent border border-transparent hover:border-plum-600/30 focus:border-plum-600 focus:bg-vanilla-50/95 rounded-xl px-2 py-0.5 -ml-2 focus:outline-none transition"
+                    class="w-full font-serif text-xl sm:text-3xl font-bold text-plum-950 leading-snug bg-transparent border border-transparent hover:border-plum-600/30 focus:border-plum-600 focus:bg-vanilla-50/95 rounded-xl px-2 py-0.5 -ml-1.5 sm:-ml-2 focus:outline-none transition"
                   />
                 </div>
 
-                <div class="flex items-center gap-2 shrink-0">
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
                   ${imageUrl ? `
-                    <div class="w-28 h-20 sm:w-36 sm:h-24 shrink-0 flex items-center justify-center">
+                    <div class="w-20 h-16 sm:w-36 sm:h-24 shrink-0 flex items-center justify-center">
                       <img
                         src="${imageUrl.replace(/"/g, '&quot;')}"
                         alt="${safeName}"
@@ -1118,7 +1118,7 @@
                 </div>
               </div>
 
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 pt-3 border-t border-plum-600/15">
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3 mt-3.5 sm:mt-4 pt-3 border-t border-plum-600/15">
                 <div class="bg-vanilla-50/95 px-3 py-2 rounded-2xl border border-lavender-300">
                   <label class="block text-[10px] font-bold uppercase tracking-wider text-mutedplum-600">Rinde (ud)</label>
                   <div class="flex items-center gap-1 mt-0.5">
@@ -1149,9 +1149,9 @@
                   </div>
                 </div>
 
-                <div class="col-span-2 sm:col-span-1 bg-vanilla-50/95 px-3 py-2 rounded-2xl border border-lavender-300 flex flex-col justify-center">
+                <div class="col-span-2 sm:col-span-1 bg-vanilla-50/95 px-3 py-2 rounded-2xl border border-lavender-300 flex items-center sm:flex-col justify-between sm:justify-center">
                   <span class="block text-[10px] font-bold uppercase tracking-wider text-mutedplum-600">Costo Unitario</span>
-                  <span class="font-semibold text-sm text-plum-900 mt-0.5">${formatMoney(metrics.unitCost)} <span class="text-[11px] font-normal text-mutedplum-600">/u</span></span>
+                  <span class="font-semibold text-sm text-plum-900 sm:mt-0.5">${formatMoney(metrics.unitCost)} <span class="text-[11px] font-normal text-mutedplum-600">/u</span></span>
                 </div>
               </div>
             </div>
@@ -1159,12 +1159,12 @@
             <div class="recipe-body ${allCollapsed ? 'hidden' : ''} flex-1 flex flex-col justify-between">
               <div class="divide-y divide-lavender-200/80">
                 ${metrics.lines.map(line => `
-                  <div class="py-2 px-4 hover:bg-lavender-50/80 transition-colors flex items-center justify-between gap-2">
+                  <div class="py-2 px-3 sm:px-4 hover:bg-lavender-50/80 transition-colors flex items-center justify-between gap-1.5 sm:gap-2">
                     <div class="min-w-0 flex-1">
-                      <span class="text-sm sm:text-base font-semibold text-plum-950 truncate block" title="${line.name}">${line.name}</span>
+                      <span class="text-xs sm:text-base font-semibold text-plum-950 truncate block" title="${line.name}">${line.name}</span>
                     </div>
-                    <div class="flex items-center gap-2 shrink-0">
-                      <div class="inline-flex items-center bg-white border border-lavender-300 rounded-lg px-1.5 py-0.5 focus-within:ring-2 focus-within:ring-plum-500">
+                    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                      <div class="inline-flex items-center bg-white border border-lavender-300 rounded-lg px-1 sm:px-1.5 py-0.5 focus-within:ring-2 focus-within:ring-plum-500">
                         <input
                           type="number"
                           step="any"
@@ -1172,11 +1172,11 @@
                           value="${line.qty}"
                           onchange="updateRecipeIngredientQty('${prod.id}', ${line.index}, this.value)"
                           title="P. Unitario: ${formatMoney(line.unitPrice)} / ${line.unit}"
-                          class="w-16 text-right font-semibold text-plum-950 bg-transparent focus:outline-none text-xs"
+                          class="w-12 sm:w-16 text-right font-semibold text-plum-950 bg-transparent focus:outline-none text-xs"
                         />
-                        <span class="text-[11px] font-medium text-mutedplum-600 ml-1">${line.unit}</span>
+                        <span class="text-[10px] sm:text-[11px] font-medium text-mutedplum-600 ml-0.5 sm:ml-1">${line.unit}</span>
                       </div>
-                      <span class="text-xs font-bold text-plum-950 w-20 text-right tabular-nums">${formatMoney(line.subtotal)}</span>
+                      <span class="text-[11px] sm:text-xs font-bold text-plum-950 w-16 sm:w-20 text-right tabular-nums">${formatMoney(line.subtotal)}</span>
                       <button onclick="removeIngredientFromProduct('${prod.id}', ${line.index})" title="Quitar de la receta" class="text-mutedplum-600/60 hover:text-rose-700 p-1 rounded-lg transition text-xs leading-none">
                         ✕
                       </button>
@@ -1185,38 +1185,38 @@
                 `).join('')}
               </div>
 
-              <div class="px-4 py-3 bg-lavender-50/90 border-t border-lavender-200 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                <select id="add-ing-select-${prod.id}" class="w-full sm:flex-1 min-w-0 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs font-medium text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
+              <div class="px-3 sm:px-4 py-3 bg-lavender-50/90 border-t border-lavender-200 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <select id="add-ing-select-${prod.id}" class="w-full sm:flex-1 min-w-0 px-3 py-2.5 sm:py-2 rounded-xl bg-white border border-lavender-300 text-xs font-medium text-plum-950 focus:outline-none focus:ring-2 focus:ring-plum-500">
                   ${optionsHtml}
                 </select>
                 <div class="flex items-center gap-2 shrink-0">
-                  <input type="number" id="add-ing-qty-${prod.id}" step="any" min="0.001" placeholder="Cant." class="w-24 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs font-semibold text-plum-950 text-center focus:outline-none focus:ring-2 focus:ring-plum-500">
-                  <button onclick="addIngredientToProduct('${prod.id}')" class="px-4 py-2 rounded-xl bg-plum-600 hover:bg-plum-800 text-vanilla-50 font-semibold text-xs whitespace-nowrap shadow-plum-sm transition cursor-pointer">
+                  <input type="number" id="add-ing-qty-${prod.id}" step="any" min="0.001" placeholder="Cant." class="flex-1 sm:flex-initial w-full sm:w-24 px-3 py-2.5 sm:py-2 rounded-xl bg-white border border-lavender-300 text-xs font-semibold text-plum-950 text-center focus:outline-none focus:ring-2 focus:ring-plum-500">
+                  <button onclick="addIngredientToProduct('${prod.id}')" class="px-4 py-2.5 sm:py-2 rounded-xl bg-plum-600 hover:bg-plum-800 text-vanilla-50 font-semibold text-xs whitespace-nowrap shadow-plum-sm transition cursor-pointer">
                     + Sumar
                   </button>
                 </div>
               </div>
             </div>
 
-            <div class="px-4 py-3 bg-lavender-100/80 border-t border-lavender-300">
-              <div class="bg-plum-900 text-vanilla-50 rounded-2xl px-3 py-2.5 shadow-plum-sm flex items-center justify-between gap-2 overflow-x-auto whitespace-nowrap">
-                <div class="flex items-center gap-1 shrink-0">
+            <div class="px-3 sm:px-4 py-3 bg-lavender-100/80 border-t border-lavender-300">
+              <div class="bg-plum-900 text-vanilla-50 rounded-2xl px-3 py-2.5 shadow-plum-sm grid grid-cols-2 sm:flex sm:items-center sm:justify-between gap-2 sm:overflow-x-auto sm:whitespace-nowrap">
+                <div class="flex items-center justify-between sm:justify-start gap-1 bg-plum-950/35 sm:bg-transparent px-2 py-1 sm:p-0 rounded-xl shrink-0">
                   <span class="text-[10px] uppercase tracking-wide text-lavender-300 font-semibold">Costo:</span>
                   <span class="text-xs font-bold text-vanilla-50">${formatMoney(metrics.totalCost)}</span>
                 </div>
-                <span class="text-lavender-400/40 select-none shrink-0">|</span>
-                <div class="flex items-center gap-1 shrink-0">
+                <span class="hidden sm:inline text-lavender-400/40 select-none shrink-0">|</span>
+                <div class="flex items-center justify-between sm:justify-start gap-1 bg-plum-950/35 sm:bg-transparent px-2 py-1 sm:p-0 rounded-xl shrink-0">
                   <span class="text-[10px] uppercase tracking-wide text-lavender-300 font-semibold">Gan. (+${metrics.marginPercent}%):</span>
                   <span class="text-xs font-bold text-lavender-200">+${formatMoney(metrics.profitAmount)}</span>
                 </div>
-                <span class="text-lavender-400/40 select-none shrink-0">|</span>
-                <div class="flex items-center gap-1 shrink-0">
+                <span class="hidden sm:inline text-lavender-400/40 select-none shrink-0">|</span>
+                <div class="flex items-center justify-between sm:justify-start gap-1 bg-plum-950/35 sm:bg-transparent px-2 py-1 sm:p-0 rounded-xl shrink-0">
                   <span class="text-[10px] uppercase tracking-wide text-lavender-200 font-bold">Final:</span>
                   <span class="text-xs sm:text-sm font-extrabold text-[#80EF80]">${formatMoney(metrics.finalPrice)}</span>
                 </div>
                 ${metrics.yieldUnits > 1 ? `
-                  <span class="text-lavender-400/40 select-none shrink-0">|</span>
-                  <div class="flex items-center gap-1 bg-plum-800 border border-lavender-400/35 px-2 py-1 rounded-xl shrink-0">
+                  <span class="hidden sm:inline text-lavender-400/40 select-none shrink-0">|</span>
+                  <div class="flex items-center justify-between sm:justify-start gap-1 bg-plum-800 border border-lavender-400/35 px-2 py-1 rounded-xl shrink-0">
                     <span class="text-[10px] uppercase tracking-wide text-lavender-200 font-semibold">x ud (${metrics.yieldUnits}u):</span>
                     <span class="text-xs font-extrabold text-vanilla-50">${formatMoney(metrics.unitSuggestedPrice)}</span>
                   </div>
@@ -1486,11 +1486,11 @@
       const optionsHtml = buildComponentOptionsHtml();
 
       row.innerHTML = `
-        <select required class="temp-ing-id flex-1 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs text-plum-950">
+        <select required class="temp-ing-id flex-1 min-w-0 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs text-plum-950">
           ${optionsHtml}
         </select>
-        <input type="number" step="any" min="0.001" placeholder="Cantidad" required class="temp-ing-qty w-24 px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs text-plum-950 text-center">
-        <button type="button" onclick="this.parentElement.remove()" class="p-2 text-mutedplum-600 hover:text-rose-700 text-xs">✕</button>
+        <input type="number" step="any" min="0.001" placeholder="Cantidad" required class="temp-ing-qty w-20 sm:w-24 px-2.5 sm:px-3 py-2 rounded-xl bg-white border border-lavender-300 text-xs text-plum-950 text-center">
+        <button type="button" onclick="this.parentElement.remove()" class="p-2 text-mutedplum-600 hover:text-rose-700 text-xs shrink-0">✕</button>
       `;
       list.appendChild(row);
     }
