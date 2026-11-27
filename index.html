@@ -590,7 +590,7 @@
       }).join('');
 
       return `
-        <option value="" selected></option>
+        <option value="" selected>Selecciona un ingrediente o uno base...</option>
         <optgroup label="Materia Prima">
           ${mpOptions}
         </optgroup>
@@ -1360,7 +1360,7 @@
       const qty = parseFloat(qtyEl?.value);
 
       if (!rawSelection) {
-        showToast('Selecciona un ingrediente o producto base', 'error');
+        showToast('Selecciona un ingrediente o uno base', 'error');
         return;
       }
 
@@ -1521,7 +1521,7 @@
       });
 
       if (!name || (mpRecipeItems.length === 0 && baseRecipeItems.length === 0)) {
-        showToast('Agrega un nombre y al menos un ingrediente o base con cantidad', 'error');
+        showToast('Agrega un nombre y al menos un ingrediente o uno base con cantidad', 'error');
         return;
       }
 
